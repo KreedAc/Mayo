@@ -418,7 +418,7 @@ img { display: block; max-width: 100%; }
 .menu-item {
   position: relative;
   background: var(--bg-2);
-  border: 2px solid var(--line);
+  border: 2px solid var(--yellow);
   padding: 0;
   transition: border-color 0.15s, transform 0.15s;
   display: flex;
