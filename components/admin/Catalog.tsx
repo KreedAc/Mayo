@@ -3,10 +3,13 @@ import type { MenuSection, MenuItem } from '@/lib/types'
 
 interface CatalogProps {
   catalog: MenuSection[]
+  dbSynced: boolean
+  syncing: boolean
   onEdit: (catId: string, itemId: string) => void
   onDelete: (catId: string, itemId: string) => void
   onAddNew: () => void
   onExport: () => void
+  onSync: () => void
 }
 
 function priceLabel(item: MenuItem): string {
@@ -17,7 +20,7 @@ function priceLabel(item: MenuItem): string {
   return `da €${min.toFixed(2)}`
 }
 
-export default function Catalog({ catalog, onEdit, onDelete, onAddNew, onExport }: CatalogProps) {
+export default function Catalog({ catalog, dbSynced, syncing, onEdit, onDelete, onAddNew, onExport, onSync }: CatalogProps) {
   const [query, setQuery] = useState('')
   const [catFilter, setCatFilter] = useState('all')
 
@@ -38,6 +41,17 @@ export default function Catalog({ catalog, onEdit, onDelete, onAddNew, onExport 
 
   return (
     <div>
+      {!dbSynced && (
+        <div className="sync-banner">
+          <div>
+            <strong>DATABASE VUOTO</strong> — Stai vedendo il catalogo statico di default.
+            Importalo nel database per poter modificare i prodotti online.
+          </div>
+          <button className="btn-primary-sm" onClick={onSync} disabled={syncing}>
+            {syncing ? 'IMPORTAZIONE…' : '↑ CARICA NEL DATABASE'}
+          </button>
+        </div>
+      )}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', flexWrap: 'wrap', gap: 16 }}>
         <div>
           <h1 className="admin-h1">CATALOGO <span className="accent">PRODOTTI</span></h1>

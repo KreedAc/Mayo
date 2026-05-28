@@ -21,6 +21,9 @@ interface ConfirmDel {
   name: string
 }
 
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+const isUUID = (id: string) => UUID_RE.test(id)
+
 async function fetchCatalogFromSupabase(): Promise<MenuSection[] | null> {
   if (!supabase) return null
   const [{ data: cats, error: ce }, { data: prods, error: pe }] = await Promise.all([
@@ -28,11 +31,11 @@ async function fetchCatalogFromSupabase(): Promise<MenuSection[] | null> {
     supabase.from('products').select('*, product_variants(*)').order('sort_order'),
   ])
   if (ce || pe || !cats || !prods) return null
-  return (cats as { id: string; label: string; emoji: string; blurb: string; sort_order: number }[])
+  const sections = (cats as { id: string; label: string; emoji: string; blurb: string; sort_order: number }[])
     .sort((a, b) => a.sort_order - b.sort_order)
     .map((cat) => ({
       id: cat.id, label: cat.label, emoji: cat.emoji || '', blurb: cat.blurb || '',
-      items: (prods as (MenuItem & { category_id: string; description?: string; image_url?: string; sort_order: number; product_variants?: { label: string; price: number; sort_order: number }[] })[])
+      items: (prods as (MenuItem & { category_id: string; description?: string; image_url?: string; allergens?: string[]; sort_order: number; product_variants?: { label: string; price: number; sort_order: number }[] })[])
         .filter((p) => p.category_id === cat.id)
         .sort((a, b) => a.sort_order - b.sort_order)
         .map((p) => ({
@@ -43,51 +46,95 @@ async function fetchCatalogFromSupabase(): Promise<MenuSection[] | null> {
           variants: p.product_variants?.sort((a, b) => a.sort_order - b.sort_order).map((v) => ({ label: v.label, price: Number(v.price) })),
           featured: p.featured || false,
           badges: p.badges || [],
+          allergens: (p as unknown as { allergens?: string[] }).allergens?.length ? (p as unknown as { allergens: string[] }).allergens : undefined,
         })),
     }))
     .filter((s) => s.items.length > 0)
+  // return null (not empty array) when DB has no data yet
+  return sections.length > 0 ? sections : null
 }
 
 export default function AdminApp() {
   const [authed, setAuthed] = useState(false)
   const [catalog, setCatalog] = useState<MenuSection[]>(MAYO_MENU)
+  const [dbSynced, setDbSynced] = useState(false)
+  const [syncing, setSyncing] = useState(false)
   const [view, setView] = useState<View>('catalog')
   const [editTarget, setEditTarget] = useState<EditTarget | null>(null)
   const [toast, setToast] = useState<string | null>(null)
   const [confirmDel, setConfirmDel] = useState<ConfirmDel | null>(null)
   const toastRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
-  // Check existing session on mount
   useEffect(() => {
     if (!supabase) return
     supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session) {
-        setAuthed(true)
-        loadCatalog()
-      }
+      if (session) { setAuthed(true); loadCatalog() }
     })
   }, [])
 
   const loadCatalog = async () => {
     const data = await fetchCatalogFromSupabase()
-    if (data) setCatalog(data)
+    if (data) { setCatalog(data); setDbSynced(true) }
+    // else: keep static MAYO_MENU, dbSynced stays false
   }
 
   const showToast = useCallback((msg: string) => {
     setToast(msg)
     if (toastRef.current) clearTimeout(toastRef.current)
-    toastRef.current = setTimeout(() => setToast(null), 1800)
+    toastRef.current = setTimeout(() => setToast(null), 2500)
   }, [])
 
-  const handleLogin = () => {
-    setAuthed(true)
-    loadCatalog()
-  }
+  const handleLogin = () => { setAuthed(true); loadCatalog() }
 
   const logout = async () => {
     if (supabase) await supabase.auth.signOut()
     setAuthed(false)
     setCatalog(MAYO_MENU)
+    setDbSynced(false)
+  }
+
+  // Import the full static catalog into Supabase in one batch
+  const syncToSupabase = async () => {
+    if (!supabase || syncing) return
+    setSyncing(true)
+    showToast('IMPORTAZIONE IN CORSO…')
+
+    // Upsert categories
+    await supabase.from('categories').upsert(
+      MAYO_MENU.map((s, i) => ({ id: s.id, label: s.label, emoji: s.emoji, blurb: s.blurb, sort_order: i })),
+      { onConflict: 'id' }
+    )
+
+    // Build products + variants with client-generated UUIDs for batch insert
+    const allProducts: object[] = []
+    const allVariants: object[] = []
+    for (const [, sec] of MAYO_MENU.entries()) {
+      for (const [pIdx, item] of sec.items.entries()) {
+        const prodId = crypto.randomUUID()
+        allProducts.push({
+          id: prodId,
+          category_id: sec.id,
+          name: item.name,
+          description: item.desc,
+          image_url: item.img || null,
+          price: item.price ?? null,
+          featured: item.featured || false,
+          badges: item.badges || [],
+          allergens: item.allergens || [],
+          sort_order: pIdx,
+        })
+        item.variants?.forEach((v, i) => {
+          allVariants.push({ product_id: prodId, label: v.label, price: v.price, sort_order: i })
+        })
+      }
+    }
+
+    await supabase.from('products').insert(allProducts)
+    if (allVariants.length) await supabase.from('product_variants').insert(allVariants)
+
+    await loadCatalog()
+    setSyncing(false)
+    showToast('CATALOGO IMPORTATO NEL DATABASE ✓')
   }
 
   const startNew = () => {
@@ -113,7 +160,7 @@ export default function AdminApp() {
   const confirmDelete = async () => {
     if (!confirmDel) return
     const { catId, itemId } = confirmDel
-    if (supabase) {
+    if (supabase && isUUID(itemId)) {
       await supabase.from('products').delete().eq('id', itemId)
     }
     setCatalog((cat) =>
@@ -124,18 +171,29 @@ export default function AdminApp() {
   }
 
   const saveProduct = async (catId: string, item: MenuItem, isNew: boolean) => {
+    // treat static (non-UUID) IDs as new records in Supabase
+    const treatAsNew = isNew || !isUUID(item.id)
+
     if (supabase) {
-      if (isNew) {
+      if (treatAsNew) {
+        // Ensure category exists first
+        const sec = MAYO_MENU.find((s) => s.id === catId) || catalog.find((s) => s.id === catId)
+        if (sec) {
+          await supabase.from('categories').upsert(
+            { id: sec.id, label: sec.label, emoji: sec.emoji, blurb: sec.blurb, sort_order: 0 },
+            { onConflict: 'id' }
+          )
+        }
         const { data: prod } = await supabase
           .from('products')
           .insert({ category_id: catId, name: item.name, description: item.desc, image_url: item.img || null, price: item.price ?? null, featured: item.featured || false, badges: item.badges || [], allergens: item.allergens || [], sort_order: 0 })
           .select().single()
-        if (prod && item.variants?.length) {
-          await supabase.from('product_variants').insert(
-            item.variants.map((v, i) => ({ product_id: prod.id, label: v.label, price: v.price, sort_order: i }))
-          )
-          item = { ...item, id: prod.id }
-        } else if (prod) {
+        if (prod) {
+          if (item.variants?.length) {
+            await supabase.from('product_variants').insert(
+              item.variants.map((v, i) => ({ product_id: prod.id, label: v.label, price: v.price, sort_order: i }))
+            )
+          }
           item = { ...item, id: prod.id }
         }
       } else {
@@ -148,13 +206,14 @@ export default function AdminApp() {
         }
       }
     }
+
     setCatalog((cat) => {
       let next = cat.map((s) => ({ ...s, items: s.items.filter((i) => i.id !== item.id) }))
       next = next.map((s) => s.id === catId ? { ...s, items: [...s.items, item] } : s)
       return next
     })
     setView('catalog')
-    showToast(isNew ? 'PRODOTTO AGGIUNTO' : 'MODIFICHE SALVATE')
+    showToast(treatAsNew && !isNew ? 'SALVATO E AGGIUNTO AL DB' : isNew ? 'PRODOTTO AGGIUNTO' : 'MODIFICHE SALVATE')
   }
 
   const exportJSON = () => {
@@ -187,10 +246,13 @@ export default function AdminApp() {
         {view === 'catalog' && (
           <Catalog
             catalog={catalog}
+            dbSynced={dbSynced}
+            syncing={syncing}
             onEdit={startEdit}
             onDelete={doDelete}
             onAddNew={startNew}
             onExport={exportJSON}
+            onSync={syncToSupabase}
           />
         )}
         {view === 'form' && editTarget && (
