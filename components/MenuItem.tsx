@@ -30,6 +30,15 @@ export default function MenuItem({ item, getQty, onAdd, onInc, onDec }: MenuItem
                 ))}
               </div>
             )}
+            {item.allergens && item.allergens.length > 0 && (
+              <button
+                className="allergen-photo-badge"
+                onClick={(e) => { e.stopPropagation(); setShowAllergens(true) }}
+                aria-label="Mostra allergeni"
+              >
+                ⚠
+              </button>
+            )}
           </div>
         )}
         <div className="menu-item-body">
@@ -45,7 +54,7 @@ export default function MenuItem({ item, getQty, onAdd, onInc, onDec }: MenuItem
             </div>
           )}
 
-          {item.allergens && item.allergens.length > 0 && (
+          {!item.img && item.allergens && item.allergens.length > 0 && (
             <button
               className="allergen-btn"
               onClick={(e) => { e.stopPropagation(); setShowAllergens(true) }}

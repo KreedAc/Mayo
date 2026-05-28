@@ -118,6 +118,38 @@ export default function MenuApp({ menu, info, hours }: MenuAppProps) {
     [notes, custName, info]
   )
 
+  const pullStartRef = useRef(-1)
+  const pullPctRef = useRef(0)
+  const [pullPct, setPullPct] = useState(0)
+
+  useEffect(() => {
+    const THRESHOLD = 80
+    const onTouchStart = (e: TouchEvent) => {
+      pullStartRef.current = window.scrollY === 0 ? e.touches[0].clientY : -1
+    }
+    const onTouchMove = (e: TouchEvent) => {
+      if (pullStartRef.current < 0) return
+      const dy = e.touches[0].clientY - pullStartRef.current
+      const pct = dy > 0 ? Math.min(dy / THRESHOLD, 1.25) : 0
+      pullPctRef.current = pct
+      setPullPct(pct)
+    }
+    const onTouchEnd = () => {
+      if (pullStartRef.current >= 0 && pullPctRef.current >= 1) { window.location.reload(); return }
+      pullStartRef.current = -1
+      pullPctRef.current = 0
+      setPullPct(0)
+    }
+    document.addEventListener('touchstart', onTouchStart, { passive: true })
+    document.addEventListener('touchmove', onTouchMove, { passive: true })
+    document.addEventListener('touchend', onTouchEnd)
+    return () => {
+      document.removeEventListener('touchstart', onTouchStart)
+      document.removeEventListener('touchmove', onTouchMove)
+      document.removeEventListener('touchend', onTouchEnd)
+    }
+  }, [])
+
   const [activeCat, setActiveCat] = useState(menu[0]?.id || '')
 
   useEffect(() => {
@@ -147,6 +179,11 @@ export default function MenuApp({ menu, info, hours }: MenuAppProps) {
 
   return (
     <>
+      {pullPct > 0.05 && (
+        <div className="ptr-indicator" style={{ opacity: Math.min(pullPct * 1.2, 1) }}>
+          {pullPct >= 1 ? '↻ RILASCIA' : '↓ AGGIORNA'}
+        </div>
+      )}
       <Nav cartCount={cartCount} onOpenCart={() => setCartOpen(true)} />
       <Hero />
       <Marquee items={MARQUEE_ITEMS} />
