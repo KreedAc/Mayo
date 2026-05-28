@@ -60,3 +60,17 @@ create policy "admin write products" on products for all
 create policy "admin write variants" on product_variants for all
   using (auth.role() = 'authenticated')
   with check (auth.role() = 'authenticated');
+
+-- GRANT espliciti (richiesti da Supabase dal 30 maggio 2026 per nuovi progetti)
+grant usage on schema public to anon, authenticated;
+
+-- anon: solo lettura del menu (nessuna autenticazione richiesta)
+grant select on categories       to anon;
+grant select on products         to anon;
+grant select on product_variants to anon;
+
+-- authenticated: lettura + scrittura completa (admin)
+grant all on categories       to authenticated;
+grant all on products         to authenticated;
+grant all on product_variants to authenticated;
+grant all on orders           to authenticated;
