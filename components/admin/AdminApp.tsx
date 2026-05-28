@@ -26,6 +26,7 @@ const isUUID = (id: string) => UUID_RE.test(id)
 
 async function fetchCatalogFromSupabase(): Promise<MenuSection[] | null> {
   if (!supabase) return null
+  try {
   const [{ data: cats, error: ce }, { data: prods, error: pe }] = await Promise.all([
     supabase.from('categories').select('*').order('sort_order'),
     supabase.from('products').select('*, product_variants(*)').order('sort_order'),
@@ -52,6 +53,7 @@ async function fetchCatalogFromSupabase(): Promise<MenuSection[] | null> {
     .filter((s) => s.items.length > 0)
   // return null (not empty array) when DB has no data yet
   return sections.length > 0 ? sections : null
+  } catch { return null }
 }
 
 export default function AdminApp() {
