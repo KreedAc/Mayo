@@ -12,6 +12,7 @@ export interface MenuItem {
   variants?: MenuVariant[]
   featured?: boolean
   badges?: string[]
+  allergens?: string[]
 }
 
 export interface MenuSection {

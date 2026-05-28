@@ -128,7 +128,7 @@ export default function AdminApp() {
       if (isNew) {
         const { data: prod } = await supabase
           .from('products')
-          .insert({ category_id: catId, name: item.name, description: item.desc, image_url: item.img || null, price: item.price ?? null, featured: item.featured || false, badges: item.badges || [], sort_order: 0 })
+          .insert({ category_id: catId, name: item.name, description: item.desc, image_url: item.img || null, price: item.price ?? null, featured: item.featured || false, badges: item.badges || [], allergens: item.allergens || [], sort_order: 0 })
           .select().single()
         if (prod && item.variants?.length) {
           await supabase.from('product_variants').insert(
@@ -139,7 +139,7 @@ export default function AdminApp() {
           item = { ...item, id: prod.id }
         }
       } else {
-        await supabase.from('products').update({ category_id: catId, name: item.name, description: item.desc, image_url: item.img || null, price: item.price ?? null, featured: item.featured || false, badges: item.badges || [] }).eq('id', item.id)
+        await supabase.from('products').update({ category_id: catId, name: item.name, description: item.desc, image_url: item.img || null, price: item.price ?? null, featured: item.featured || false, badges: item.badges || [], allergens: item.allergens || [] }).eq('id', item.id)
         await supabase.from('product_variants').delete().eq('product_id', item.id)
         if (item.variants?.length) {
           await supabase.from('product_variants').insert(

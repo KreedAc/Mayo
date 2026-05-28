@@ -1048,3 +1048,93 @@ img { display: block; max-width: 100%; }
   .menu-item-desc { display: none; }
   .menu-item-body { padding: 10px; }
 }
+
+/* ===== ALLERGENI ===== */
+.allergen-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin-top: 10px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-dim);
+  border: 1px dashed var(--line);
+  padding: 5px 10px;
+  background: transparent;
+  transition: all 0.12s;
+  align-self: flex-start;
+}
+.allergen-btn:hover { color: var(--yellow); border-color: var(--yellow); border-style: solid; }
+
+.allergen-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(4px);
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+.allergen-modal {
+  width: min(400px, 100%);
+  background: var(--bg-2);
+  border: 2px solid var(--yellow);
+  box-shadow: 8px 8px 0 #000;
+  padding: 28px;
+}
+.allergen-modal-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+.allergen-modal-head span {
+  font-family: var(--font-display);
+  font-size: 20px;
+  color: var(--yellow);
+  letter-spacing: 0.06em;
+}
+.allergen-modal-head button {
+  width: 32px; height: 32px;
+  border: 1.5px solid var(--line);
+  font-size: 14px;
+}
+.allergen-modal-head button:hover { border-color: var(--yellow); color: var(--yellow); }
+.allergen-modal-name {
+  font-family: var(--font-display);
+  font-size: 13px;
+  letter-spacing: 0.04em;
+  color: var(--ink-dim);
+  text-transform: uppercase;
+  margin-bottom: 18px;
+  padding-bottom: 14px;
+  border-bottom: 1px dashed var(--line);
+}
+.allergen-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.allergen-tag {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 6px 12px;
+  background: var(--bg-3);
+  border: 1.5px solid var(--yellow);
+  color: var(--ink);
+}
+.allergen-modal-note {
+  font-family: var(--font-body);
+  font-size: 11px;
+  color: var(--ink-dim);
+  margin-top: 18px;
+  padding-top: 14px;
+  border-top: 1px dashed var(--line);
+  line-height: 1.6;
+}

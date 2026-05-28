@@ -4,6 +4,12 @@ import PreviewCard from './PreviewCard'
 
 const BADGE_OPTIONS = ['NEW', 'HOT', 'CHEF', 'LIMITED', 'VEG']
 
+const ALLERGEN_OPTIONS = [
+  'Glutine', 'Crostacei', 'Uova', 'Pesce', 'Arachidi', 'Soia',
+  'Latte', 'Frutta a guscio', 'Sedano', 'Senape', 'Sesamo',
+  'Solfiti', 'Lupini', 'Molluschi',
+]
+
 interface Draft {
   id: string
   name: string
@@ -11,6 +17,7 @@ interface Draft {
   img: string
   featured: boolean
   badges: string[]
+  allergens: string[]
   priceMode: 'single' | 'variants'
   price: string
   variants: { label: string; price: string }[]
@@ -18,7 +25,7 @@ interface Draft {
 }
 
 export function emptyDraft(catId: string): Draft {
-  return { id: '', name: '', desc: '', img: '', featured: false, badges: [], priceMode: 'single', price: '', variants: [{ label: '', price: '' }], _categoryId: catId }
+  return { id: '', name: '', desc: '', img: '', featured: false, badges: [], allergens: [], priceMode: 'single', price: '', variants: [{ label: '', price: '' }], _categoryId: catId }
 }
 
 export function draftFromItem(item: MenuItem, catId: string): Draft {
@@ -30,6 +37,7 @@ export function draftFromItem(item: MenuItem, catId: string): Draft {
     img: item.img || '',
     featured: !!item.featured,
     badges: [...(item.badges || [])],
+    allergens: [...(item.allergens || [])],
     priceMode: hasVariants ? 'variants' : 'single',
     price: item.price != null ? String(item.price) : '',
     variants: hasVariants ? item.variants!.map((v) => ({ label: v.label || '', price: String(v.price) })) : [{ label: '', price: '' }],
@@ -61,6 +69,13 @@ export default function ProductForm({ catalog, draft: initial, isNew, onCancel, 
     }))
   }
 
+  const toggleAllergen = (a: string) => {
+    setD((p) => ({
+      ...p,
+      allergens: p.allergens.includes(a) ? p.allergens.filter((x) => x !== a) : [...p.allergens, a],
+    }))
+  }
+
   const setVariant = (i: number, k: 'label' | 'price', v: string) => {
     setD((p) => {
       const variants = p.variants.map((row, idx) => (idx === i ? { ...row, [k]: v } : row))
@@ -84,6 +99,7 @@ export default function ProductForm({ catalog, draft: initial, isNew, onCancel, 
     if (d.img.trim()) item.img = d.img.trim()
     if (d.featured) item.featured = true
     if (d.badges.length) item.badges = d.badges
+    if (d.allergens.length) item.allergens = d.allergens
     if (d.priceMode === 'single') {
       item.price = parseFloat(d.price) || 0
     } else {
@@ -173,6 +189,16 @@ export default function ProductForm({ catalog, draft: initial, isNew, onCancel, 
               ))}
             </div>
             <div className="field-hint">NEW = novità · HOT = piccante · CHEF = consigliato · LIMITED = edizione limitata · VEG = vegetariano.</div>
+          </div>
+
+          <div className="field">
+            <label className="field-label">Allergeni presenti</label>
+            <div className="badge-picker">
+              {ALLERGEN_OPTIONS.map((a) => (
+                <button type="button" key={a} className={`badge-pick allergen-pick ${d.allergens.includes(a) ? 'on' : ''}`} onClick={() => toggleAllergen(a)}>{a}</button>
+              ))}
+            </div>
+            <div className="field-hint">Seleziona tutti gli allergeni presenti nel prodotto (14 allergeni EU obbligatori per legge).</div>
           </div>
 
           <div className="field">

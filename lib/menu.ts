@@ -11,6 +11,7 @@ interface SupabaseProduct {
   price: number | null
   featured: boolean
   badges: string[]
+  allergens: string[]
   sort_order: number
   product_variants: { id: string; label: string; price: number; sort_order: number }[]
 }
@@ -50,6 +51,7 @@ function transformToMenu(
             variants: variants?.length ? variants : undefined,
             featured: p.featured || false,
             badges: p.badges || [],
+            allergens: p.allergens?.length ? p.allergens : undefined,
           }
         }),
     }))
