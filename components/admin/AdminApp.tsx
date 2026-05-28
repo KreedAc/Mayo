@@ -173,6 +173,7 @@ export default function AdminApp() {
   }
 
   const saveProduct = async (catId: string, item: MenuItem, isNew: boolean) => {
+    const originalId = item.id
     // treat static (non-UUID) IDs as new records in Supabase
     const treatAsNew = isNew || !isUUID(item.id)
 
@@ -210,7 +211,8 @@ export default function AdminApp() {
     }
 
     setCatalog((cat) => {
-      let next = cat.map((s) => ({ ...s, items: s.items.filter((i) => i.id !== item.id) }))
+      // remove both the original static id and the new DB uuid (if id was reassigned)
+      let next = cat.map((s) => ({ ...s, items: s.items.filter((i) => i.id !== originalId && i.id !== item.id) }))
       next = next.map((s) => s.id === catId ? { ...s, items: [...s.items, item] } : s)
       return next
     })

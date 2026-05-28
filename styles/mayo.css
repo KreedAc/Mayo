@@ -1054,7 +1054,6 @@ img { display: block; max-width: 100%; }
   display: inline-flex;
   align-items: center;
   gap: 5px;
-  margin-top: 10px;
   font-family: var(--font-mono);
   font-size: 10px;
   letter-spacing: 0.14em;

@@ -45,6 +45,16 @@ export default function MenuItem({ item, getQty, onAdd, onInc, onDec }: MenuItem
             </div>
           )}
 
+          {item.allergens && item.allergens.length > 0 && (
+            <button
+              className="allergen-btn"
+              onClick={(e) => { e.stopPropagation(); setShowAllergens(true) }}
+              aria-label="Mostra allergeni"
+            >
+              ⚠ Allergeni
+            </button>
+          )}
+
           {singleNoLabel ? (
             <div className="menu-item-foot">
               <span className="menu-item-price">€{variants[0].price.toFixed(2)}</span>
@@ -81,16 +91,6 @@ export default function MenuItem({ item, getQty, onAdd, onInc, onDec }: MenuItem
                 )
               })}
             </div>
-          )}
-
-          {item.allergens && item.allergens.length > 0 && (
-            <button
-              className="allergen-btn"
-              onClick={(e) => { e.stopPropagation(); setShowAllergens(true) }}
-              aria-label="Mostra allergeni"
-            >
-              ⚠ Allergeni
-            </button>
           )}
         </div>
       </article>
