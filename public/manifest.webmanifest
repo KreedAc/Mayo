@@ -1,0 +1,18 @@
+{
+  "name": "MAYO — A Burger Experience",
+  "short_name": "MAYO",
+  "description": "Smasheria di Lamezia Terme. Ordina il tuo smash burger.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0a0a0a",
+  "theme_color": "#ffe600",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/mayo-logo.jpg",
+      "sizes": "any",
+      "type": "image/jpeg",
+      "purpose": "any"
+    }
+  ]
+}
