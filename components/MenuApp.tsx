@@ -57,6 +57,8 @@ export default function MenuApp({ menu, info, hours }: MenuAppProps) {
   })
   useEffect(() => { localStorage.setItem('mayo-cust-name', custName) }, [custName])
 
+  const [pickupTime, setPickupTime] = useState<string>('')
+
   const [cartOpen, setCartOpen] = useState(false)
   const [toast, setToast] = useState<string | null>(null)
   const toastRef = useRef<ReturnType<typeof setTimeout> | null>(null)
@@ -99,6 +101,7 @@ export default function MenuApp({ menu, info, hours }: MenuAppProps) {
       L.push('🍔 *NUOVO ORDINE — MAYO*')
       L.push('')
       L.push(`*Nome:* ${(custName || '').trim()}`)
+      L.push(`*Orario ritiro:* ${pickupTime}`)
       L.push('')
       lines.forEach((l) => {
         const variant = l.variantLabel ? ` (${l.variantLabel})` : ''
@@ -110,12 +113,11 @@ export default function MenuApp({ menu, info, hours }: MenuAppProps) {
       L.push(`*TOTALE: €${totals.total.toFixed(2)}*`)
       L.push('')
       L.push('Ritiro: ')
-      L.push('Orario: ')
       const text = encodeURIComponent(L.join('\n'))
       const url = `https://wa.me/39${info.phoneRaw}?text=${text}`
       window.open(url, '_blank')
     },
-    [notes, custName, info]
+    [notes, custName, pickupTime, info]
   )
 
   const pullStartRef = useRef(-1)
@@ -219,13 +221,15 @@ export default function MenuApp({ menu, info, hours }: MenuAppProps) {
         cart={cart}
         notes={notes}
         custName={custName}
+        pickupTime={pickupTime}
         menuFlat={menuFlat}
         onInc={incItem}
         onDec={decItem}
         onNote={setNote}
         onName={setCustName}
+        onTime={setPickupTime}
         onCheckout={checkout}
-        onClear={() => { setCart({}); setNotes({}); showToast('CARRELLO SVUOTATO') }}
+        onClear={() => { setCart({}); setNotes({}); setPickupTime(''); showToast('CARRELLO SVUOTATO') }}
         info={info}
       />
 

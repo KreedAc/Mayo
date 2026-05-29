@@ -15,19 +15,21 @@ interface CartProps {
   cart: CartMap
   notes: NotesMap
   custName: string
+  pickupTime: string
   menuFlat: Record<string, { name: string; variantLabel: string; price: number }>
   onInc: (key: string) => void
   onDec: (key: string) => void
   onNote: (key: string, text: string) => void
   onName: (name: string) => void
+  onTime: (time: string) => void
   onCheckout: (lines: CartLine[], totals: { subtotal: number; total: number }) => void
   onClear: () => void
   info: SiteInfo
 }
 
 export default function Cart({
-  open, onClose, cart, notes, custName, menuFlat,
-  onInc, onDec, onNote, onName, onCheckout, onClear, info,
+  open, onClose, cart, notes, custName, pickupTime, menuFlat,
+  onInc, onDec, onNote, onName, onTime, onCheckout, onClear, info,
 }: CartProps) {
   const lines: CartLine[] = Object.keys(cart)
     .filter((id) => cart[id] > 0)
@@ -43,7 +45,7 @@ export default function Cart({
   const total = subtotal
   const aboveMin = subtotal >= info.minOrder
   const missing = Math.max(0, info.minOrder - subtotal)
-  const canCheckout = aboveMin && (custName || '').trim().length >= 2
+  const canCheckout = aboveMin && (custName || '').trim().length >= 2 && (pickupTime || '').trim().length > 0
 
   return (
     <>
@@ -108,6 +110,15 @@ export default function Cart({
                 maxLength={40}
               />
             </div>
+            <div className="cart-name-field">
+              <label className="cart-name-label">Orario di ritiro <span className="req">*</span></label>
+              <input
+                className="cart-name-input"
+                type="time"
+                value={pickupTime || ''}
+                onChange={(e) => onTime(e.target.value)}
+              />
+            </div>
             <button
               className="cart-checkout"
               disabled={!canCheckout}
@@ -115,8 +126,10 @@ export default function Cart({
             >
               {!aboveMin
                 ? `MINIMO €${info.minOrder.toFixed(2)}`
-                : !canCheckout
+                : (custName || '').trim().length < 2
                 ? 'INSERISCI IL NOME'
+                : !(pickupTime || '').trim()
+                ? 'INSERISCI L\'ORARIO'
                 : 'PROCEDI SU WHATSAPP →'}
             </button>
             <button className="cart-clear" onClick={onClear}>Svuota</button>
