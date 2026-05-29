@@ -12,6 +12,7 @@ interface SupabaseProduct {
   featured: boolean
   badges: string[]
   allergens: string[]
+  hidden: boolean
   sort_order: number
   product_variants: { id: string; label: string; price: number; sort_order: number }[]
 }
@@ -36,7 +37,7 @@ function transformToMenu(
       emoji: cat.emoji || '',
       blurb: cat.blurb || '',
       items: products
-        .filter((p) => p.category_id === cat.id)
+        .filter((p) => p.category_id === cat.id && !p.hidden)
         .sort((a, b) => a.sort_order - b.sort_order)
         .map((p): MenuItem => {
           const variants = p.product_variants

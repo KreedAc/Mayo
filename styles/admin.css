@@ -226,6 +226,9 @@
   transition: border-color 0.12s;
 }
 .prod-row:hover { border-color: var(--yellow); }
+.prod-row.prod-hidden { opacity: 0.45; }
+.icon-btn.vis-on { color: var(--yellow); }
+.icon-btn.vis-off { color: var(--ink-dim); }
 .prod-thumb {
   width: 56px; height: 56px;
   object-fit: cover;

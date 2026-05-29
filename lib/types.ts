@@ -13,6 +13,7 @@ export interface MenuItem {
   featured?: boolean
   badges?: string[]
   allergens?: string[]
+  hidden?: boolean
 }
 
 export interface MenuSection {

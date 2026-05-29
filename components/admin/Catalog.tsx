@@ -7,6 +7,7 @@ interface CatalogProps {
   syncing: boolean
   migrating: boolean
   onEdit: (catId: string, itemId: string) => void
+  onToggleHidden: (catId: string, itemId: string) => void
   onDelete: (catId: string, itemId: string) => void
   onAddNew: () => void
   onExport: () => void
@@ -22,7 +23,7 @@ function priceLabel(item: MenuItem): string {
   return `da €${min.toFixed(2)}`
 }
 
-export default function Catalog({ catalog, dbSynced, syncing, migrating, onEdit, onDelete, onAddNew, onExport, onSync, onMigrateImages }: CatalogProps) {
+export default function Catalog({ catalog, dbSynced, syncing, migrating, onEdit, onToggleHidden, onDelete, onAddNew, onExport, onSync, onMigrateImages }: CatalogProps) {
   const [query, setQuery] = useState('')
   const [catFilter, setCatFilter] = useState('all')
 
@@ -96,7 +97,7 @@ export default function Catalog({ catalog, dbSynced, syncing, migrating, onEdit,
               <span className="ct">{sec.items.length} prodotti</span>
             </div>
             {sec.items.map((item) => (
-              <div className="prod-row" key={item.id}>
+              <div className={`prod-row${item.hidden ? ' prod-hidden' : ''}`} key={item.id}>
                 {item.img
                   ? <img className="prod-thumb" src={item.img} alt="" loading="lazy" />
                   : <div className="prod-thumb placeholder">🍔</div>}
@@ -112,6 +113,11 @@ export default function Catalog({ catalog, dbSynced, syncing, migrating, onEdit,
                 </div>
                 <span className="prod-price">{priceLabel(item)}</span>
                 <div className="prod-actions">
+                  <button
+                    className={`icon-btn${item.hidden ? ' vis-off' : ' vis-on'}`}
+                    title={item.hidden ? 'Mostra nel menu' : 'Nascondi dal menu'}
+                    onClick={() => onToggleHidden(sec.id, item.id)}
+                  >{item.hidden ? '○' : '●'}</button>
                   <button className="icon-btn" title="Modifica" onClick={() => onEdit(sec.id, item.id)}>✎</button>
                   <button className="icon-btn del" title="Elimina" onClick={() => onDelete(sec.id, item.id)}>🗑</button>
                 </div>

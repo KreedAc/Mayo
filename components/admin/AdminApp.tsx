@@ -48,6 +48,7 @@ async function fetchCatalogFromSupabase(): Promise<MenuSection[] | null> {
           featured: p.featured || false,
           badges: p.badges || [],
           allergens: (p as unknown as { allergens?: string[] }).allergens?.length ? (p as unknown as { allergens: string[] }).allergens : undefined,
+          hidden: (p as unknown as { hidden?: boolean }).hidden || false,
         })),
     }))
     .filter((s) => s.items.length > 0)
@@ -193,6 +194,23 @@ export default function AdminApp() {
     setView('form')
   }
 
+  const toggleHidden = async (catId: string, itemId: string) => {
+    const sec = catalog.find((s) => s.id === catId)
+    const item = sec?.items.find((i) => i.id === itemId)
+    if (!item) return
+    const newHidden = !item.hidden
+    if (supabase && isUUID(itemId)) {
+      await supabase.from('products').update({ hidden: newHidden }).eq('id', itemId)
+    }
+    setCatalog((cat) =>
+      cat.map((s) => s.id === catId
+        ? { ...s, items: s.items.map((i) => i.id === itemId ? { ...i, hidden: newHidden } : i) }
+        : s
+      )
+    )
+    showToast(newHidden ? 'PRODOTTO NASCOSTO' : 'PRODOTTO VISIBILE')
+  }
+
   const doDelete = (catId: string, itemId: string) => {
     const sec = catalog.find((s) => s.id === catId)
     const item = sec?.items.find((i) => i.id === itemId)
@@ -295,6 +313,7 @@ export default function AdminApp() {
             syncing={syncing}
             migrating={migrating}
             onEdit={startEdit}
+            onToggleHidden={toggleHidden}
             onDelete={doDelete}
             onAddNew={startNew}
             onExport={exportJSON}
