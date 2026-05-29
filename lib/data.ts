@@ -1,6 +1,6 @@
 import type { MenuSection, HoursEntry, SiteInfo } from './types'
 
-const J = 'https://www.jmenu.it/media/cache/mayo/item-menu/800x600/menu-digitale-jmenu-'
+const J = 'https://nxwwzllozuoyixmurwmp.supabase.co/storage/v1/object/public/product-images/'
 
 export const MAYO_MENU: MenuSection[] = [
   {
