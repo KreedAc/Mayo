@@ -87,38 +87,42 @@ export default function Cart({
               </div>
             ))
           )}
+          {lines.length > 0 && (
+            <div className="cart-foot">
+              {!aboveMin && (
+                <div className="cart-warn">
+                  Mancano <b>€{missing.toFixed(2)}</b> per l&apos;ordine minimo (€{info.minOrder.toFixed(2)})
+                </div>
+              )}
+              <div className="cart-totals">
+                <div className="row"><span>Subtotale</span><span>€{subtotal.toFixed(2)}</span></div>
+                <div className="row total"><span>TOTALE</span><span>€{total.toFixed(2)}</span></div>
+              </div>
+              <div className="cart-name-field">
+                <label className="cart-name-label">Il tuo nome <span className="req">*</span></label>
+                <input
+                  className="cart-name-input"
+                  type="text"
+                  value={custName || ''}
+                  onChange={(e) => onName(e.target.value)}
+                  placeholder="Come ti chiami?"
+                  maxLength={40}
+                />
+              </div>
+              <div className="cart-name-field">
+                <label className="cart-name-label">Orario di ritiro <span className="req">*</span></label>
+                <input
+                  className="cart-name-input"
+                  type="time"
+                  value={pickupTime || ''}
+                  onChange={(e) => onTime(e.target.value)}
+                />
+              </div>
+            </div>
+          )}
         </div>
         {lines.length > 0 && (
-          <div className="cart-foot">
-            {!aboveMin && (
-              <div className="cart-warn">
-                Mancano <b>€{missing.toFixed(2)}</b> per l&apos;ordine minimo (€{info.minOrder.toFixed(2)})
-              </div>
-            )}
-            <div className="cart-totals">
-              <div className="row"><span>Subtotale</span><span>€{subtotal.toFixed(2)}</span></div>
-              <div className="row total"><span>TOTALE</span><span>€{total.toFixed(2)}</span></div>
-            </div>
-            <div className="cart-name-field">
-              <label className="cart-name-label">Il tuo nome <span className="req">*</span></label>
-              <input
-                className="cart-name-input"
-                type="text"
-                value={custName || ''}
-                onChange={(e) => onName(e.target.value)}
-                placeholder="Come ti chiami?"
-                maxLength={40}
-              />
-            </div>
-            <div className="cart-name-field">
-              <label className="cart-name-label">Orario di ritiro <span className="req">*</span></label>
-              <input
-                className="cart-name-input"
-                type="time"
-                value={pickupTime || ''}
-                onChange={(e) => onTime(e.target.value)}
-              />
-            </div>
+          <div className="cart-actions">
             <button
               className="cart-checkout"
               disabled={!canCheckout}
