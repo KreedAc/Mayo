@@ -44,7 +44,7 @@ async function fetchCatalogFromSupabase(): Promise<MenuSection[] | null> {
           desc: (p as unknown as { description?: string }).description || '',
           img: (p as unknown as { image_url?: string }).image_url || undefined,
           price: p.price ?? undefined,
-          variants: p.product_variants?.sort((a, b) => a.sort_order - b.sort_order).map((v) => ({ label: v.label, price: Number(v.price) })),
+          variants: p.product_variants?.length ? p.product_variants.sort((a, b) => a.sort_order - b.sort_order).map((v) => ({ label: v.label, price: Number(v.price) })) : undefined,
           featured: p.featured || false,
           badges: p.badges || [],
           allergens: (p as unknown as { allergens?: string[] }).allergens?.length ? (p as unknown as { allergens: string[] }).allergens : undefined,
