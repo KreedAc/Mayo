@@ -43,7 +43,14 @@ let failed = 0
 for (const filename of filenames) {
   process.stdout.write(`  ${filename} ... `)
   try {
-    const res = await fetch(OLD_BASE + filename)
+    const res = await fetch(OLD_BASE + filename, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1',
+        'Referer': 'https://www.jmenu.it/',
+        'Accept': 'image/webp,image/jpeg,image/*,*/*;q=0.8',
+        'Accept-Language': 'it-IT,it;q=0.9',
+      }
+    })
     if (!res.ok) throw new Error(`HTTP ${res.status}`)
     const buf = await res.arrayBuffer()
     const { error } = await sb.storage

@@ -5,11 +5,13 @@ interface CatalogProps {
   catalog: MenuSection[]
   dbSynced: boolean
   syncing: boolean
+  migrating: boolean
   onEdit: (catId: string, itemId: string) => void
   onDelete: (catId: string, itemId: string) => void
   onAddNew: () => void
   onExport: () => void
   onSync: () => void
+  onMigrateImages: () => void
 }
 
 function priceLabel(item: MenuItem): string {
@@ -20,7 +22,7 @@ function priceLabel(item: MenuItem): string {
   return `da €${min.toFixed(2)}`
 }
 
-export default function Catalog({ catalog, dbSynced, syncing, onEdit, onDelete, onAddNew, onExport, onSync }: CatalogProps) {
+export default function Catalog({ catalog, dbSynced, syncing, migrating, onEdit, onDelete, onAddNew, onExport, onSync, onMigrateImages }: CatalogProps) {
   const [query, setQuery] = useState('')
   const [catFilter, setCatFilter] = useState('all')
 
@@ -57,8 +59,11 @@ export default function Catalog({ catalog, dbSynced, syncing, onEdit, onDelete, 
           <h1 className="admin-h1">CATALOGO <span className="accent">PRODOTTI</span></h1>
           <p className="admin-lead">Gestisci i prodotti già in menu. Modifica, elimina o aggiungine di nuovi.</p>
         </div>
-        <div style={{ display: 'flex', gap: 10, marginBottom: 28 }}>
+        <div style={{ display: 'flex', gap: 10, marginBottom: 28, flexWrap: 'wrap' }}>
           <button className="btn-outline-sm" onClick={onExport}>↓ ESPORTA JSON</button>
+          <button className="btn-outline-sm" onClick={onMigrateImages} disabled={migrating} title="Sposta le foto da jmenu.it su Supabase Storage">
+            {migrating ? '↑ MIGRAZIONE…' : '↑ MIGRA IMMAGINI'}
+          </button>
           <button className="btn-primary-sm" onClick={onAddNew}>+ NUOVO PRODOTTO</button>
         </div>
       </div>

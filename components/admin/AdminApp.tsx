@@ -61,6 +61,7 @@ export default function AdminApp() {
   const [catalog, setCatalog] = useState<MenuSection[]>(MAYO_MENU)
   const [dbSynced, setDbSynced] = useState(false)
   const [syncing, setSyncing] = useState(false)
+  const [migrating, setMigrating] = useState(false)
   const [view, setView] = useState<View>('catalog')
   const [editTarget, setEditTarget] = useState<EditTarget | null>(null)
   const [toast, setToast] = useState<string | null>(null)
@@ -137,6 +138,46 @@ export default function AdminApp() {
     await loadCatalog()
     setSyncing(false)
     showToast('CATALOGO IMPORTATO NEL DATABASE ✓')
+  }
+
+  const migrateImages = async () => {
+    if (!supabase || migrating) return
+    setMigrating(true)
+    showToast('MIGRAZIONE IN CORSO…')
+    const BUCKET = 'product-images'
+    const OLD_BASE = 'https://www.jmenu.it/media/cache/mayo/item-menu/800x600/menu-digitale-jmenu-'
+
+    // Collect unique image URLs from static catalog
+    const urls = [...new Set(MAYO_MENU.flatMap((s) => s.items.map((i) => i.img).filter(Boolean) as string[]))]
+    let ok = 0, fail = 0
+
+    for (const url of urls) {
+      try {
+        const res = await fetch(url)
+        if (!res.ok) throw new Error(`HTTP ${res.status}`)
+        const blob = await res.blob()
+        const filename = url.split('/').pop()!
+        const { error } = await supabase.storage.from(BUCKET).upload(filename, blob, { contentType: 'image/jpeg', upsert: true })
+        if (error) throw new Error(error.message)
+        ok++
+      } catch { fail++ }
+    }
+
+    if (ok > 0) {
+      // Update image_url in DB for all products still pointing to jmenu.it
+      const { data: prods } = await supabase.from('products').select('id, image_url')
+      for (const p of prods || []) {
+        if (p.image_url?.startsWith(OLD_BASE)) {
+          const filename = p.image_url.replace(OLD_BASE, '')
+          const { data: { publicUrl } } = supabase.storage.from(BUCKET).getPublicUrl(filename)
+          await supabase.from('products').update({ image_url: publicUrl }).eq('id', p.id)
+        }
+      }
+      await loadCatalog()
+    }
+
+    setMigrating(false)
+    showToast(fail === 0 ? `${ok} IMMAGINI MIGRATE ✓` : `${ok} OK · ${fail} FALLITE (CORS?)`)
   }
 
   const startNew = () => {
@@ -252,11 +293,13 @@ export default function AdminApp() {
             catalog={catalog}
             dbSynced={dbSynced}
             syncing={syncing}
+            migrating={migrating}
             onEdit={startEdit}
             onDelete={doDelete}
             onAddNew={startNew}
             onExport={exportJSON}
             onSync={syncToSupabase}
+            onMigrateImages={migrateImages}
           />
         )}
         {view === 'form' && editTarget && (
