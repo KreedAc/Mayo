@@ -228,7 +228,23 @@
 .prod-row:hover { border-color: var(--yellow); }
 .prod-row.prod-hidden { opacity: 0.45; }
 .icon-btn.vis-on { color: var(--yellow); }
-.icon-btn.vis-off { color: var(--ink-dim); }
+.icon-btn.vis-off {
+  color: var(--ink-dim);
+  position: relative;
+}
+.icon-btn.vis-off::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to bottom right,
+    transparent calc(50% - 1px),
+    var(--ink-dim) calc(50% - 1px),
+    var(--ink-dim) calc(50% + 1px),
+    transparent calc(50% + 1px)
+  );
+  pointer-events: none;
+}
 .prod-thumb {
   width: 56px; height: 56px;
   object-fit: cover;

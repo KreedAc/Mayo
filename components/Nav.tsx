@@ -17,8 +17,7 @@ export default function Nav({ cartCount, onOpenCart }: NavProps) {
         <div className="nav-spacer" />
         <div className="nav-links">
           <a href="#menu">Menu</a>
-          <a href="#info">Dove siamo</a>
-          <a href="#info">Orari</a>
+          <a href="#info">Dove siamo &amp; Orari</a>
         </div>
         <button className="nav-cart" onClick={onOpenCart}>
           <span className="nav-cart-bag" aria-hidden>☰</span>

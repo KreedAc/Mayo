@@ -117,7 +117,7 @@ export default function Catalog({ catalog, dbSynced, syncing, migrating, onEdit,
                     className={`icon-btn${item.hidden ? ' vis-off' : ' vis-on'}`}
                     title={item.hidden ? 'Mostra nel menu' : 'Nascondi dal menu'}
                     onClick={() => onToggleHidden(sec.id, item.id)}
-                  >{item.hidden ? '○' : '●'}</button>
+                  >👁</button>
                   <button className="icon-btn" title="Modifica" onClick={() => onEdit(sec.id, item.id)}>✎</button>
                   <button className="icon-btn del" title="Elimina" onClick={() => onDelete(sec.id, item.id)}>🗑</button>
                 </div>

@@ -37,7 +37,7 @@ export default function MenuItem({ item, getQty, onAdd, onInc, onDec }: MenuItem
                 onClick={(e) => { e.stopPropagation(); setShowAllergens(true) }}
                 aria-label="Mostra allergeni"
               >
-                ⚠ ALLERGENI
+                ALLERGENI
               </button>
             )}
           </div>

@@ -1116,8 +1116,7 @@ img { display: block; max-width: 100%; }
   z-index: 3;
   display: inline-flex;
   align-items: center;
-  gap: 4px;
-  padding: 4px 8px;
+  padding: 2px 5px;
   background: rgba(0, 0, 0, 0.78);
   backdrop-filter: blur(4px);
   color: var(--yellow);
