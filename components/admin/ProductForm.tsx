@@ -1,5 +1,6 @@
 import { useState, useMemo } from 'react'
 import type { MenuSection, MenuItem } from '@/lib/types'
+import { supabase } from '@/lib/supabase'
 import PreviewCard from './PreviewCard'
 
 const BADGE_OPTIONS = ['NEW', 'HOT', 'CHEF', 'LIMITED', 'VEG']
@@ -61,6 +62,22 @@ function slugify(s: string): string {
 export default function ProductForm({ catalog, draft: initial, isNew, onCancel, onSave }: ProductFormProps) {
   const [d, setD] = useState<Draft>(initial)
   const set = <K extends keyof Draft>(k: K, v: Draft[K]) => setD((p) => ({ ...p, [k]: v }))
+  const [uploading, setUploading] = useState(false)
+
+  const handleImageUpload = async (file: File) => {
+    if (!supabase) return
+    setUploading(true)
+    const ext = file.name.split('.').pop() || 'jpg'
+    const name = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`
+    const { error } = await supabase.storage
+      .from('product-images')
+      .upload(name, file, { contentType: file.type })
+    if (!error) {
+      const { data: { publicUrl } } = supabase.storage.from('product-images').getPublicUrl(name)
+      set('img', publicUrl)
+    }
+    setUploading(false)
+  }
 
   const toggleBadge = (b: string) => {
     setD((p) => ({
@@ -153,9 +170,18 @@ export default function ProductForm({ catalog, draft: initial, isNew, onCancel, 
           </div>
 
           <div className="field">
-            <label className="field-label">URL Immagine</label>
-            <input className="inp" value={d.img} onChange={(e) => set('img', e.target.value)} placeholder="https://…/foto.jpg" />
-            <div className="field-hint">Incolla l&apos;URL della foto professionale. Lascia vuoto per nessuna foto.</div>
+            <label className="field-label">Immagine</label>
+            <div style={{ display: 'flex', gap: 8 }}>
+              <input className="inp" style={{ flex: 1 }} value={d.img} onChange={(e) => set('img', e.target.value)} placeholder="https://… oppure carica con il pulsante →" />
+              {supabase && (
+                <label className={`btn-outline-sm${uploading ? ' disabled' : ''}`} style={{ cursor: uploading ? 'default' : 'pointer', whiteSpace: 'nowrap', display: 'flex', alignItems: 'center' }}>
+                  {uploading ? '…' : '↑ CARICA'}
+                  <input type="file" accept="image/*" style={{ display: 'none' }} disabled={uploading} onChange={(e) => { const f = e.target.files?.[0]; if (f) handleImageUpload(f) }} />
+                </label>
+              )}
+            </div>
+            {d.img && <img src={d.img} alt="" style={{ marginTop: 8, height: 80, objectFit: 'cover', border: '1px solid var(--line)' }} />}
+            <div className="field-hint">Carica direttamente su Supabase oppure incolla un URL. Lascia vuoto per nessuna foto.</div>
           </div>
 
           <div className="field">
