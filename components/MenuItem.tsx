@@ -15,12 +15,13 @@ export default function MenuItem({ item, getQty, onAdd, onInc, onDec }: MenuItem
   const variants: MenuVariant[] = item.variants || [{ label: '', price: item.price || 0 }]
   const singleNoLabel = variants.length === 1 && !variants[0].label
   const [showAllergens, setShowAllergens] = useState(false)
+  const [showImage, setShowImage] = useState(false)
 
   return (
     <>
       <article className={`menu-item ${item.featured ? 'featured' : ''}`}>
         {item.img && (
-          <div className="menu-item-photo">
+          <div className="menu-item-photo" onClick={() => setShowImage(true)} style={{ cursor: 'zoom-in' }}>
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={item.img} alt={item.name} loading="lazy" />
             {item.badges && item.badges.length > 0 && (
@@ -103,6 +104,14 @@ export default function MenuItem({ item, getQty, onAdd, onInc, onDec }: MenuItem
           )}
         </div>
       </article>
+
+      {showImage && item.img && (
+        <div className="lightbox-overlay" onClick={() => setShowImage(false)}>
+          <button className="lightbox-close" onClick={() => setShowImage(false)} aria-label="Chiudi">✕</button>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={item.img} alt={item.name} className="lightbox-img" onClick={(e) => e.stopPropagation()} />
+        </div>
+      )}
 
       {showAllergens && item.allergens && (
         <div className="allergen-overlay" onClick={() => setShowAllergens(false)}>
