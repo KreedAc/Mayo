@@ -112,7 +112,6 @@ export default function MenuApp({ menu, info, hours }: MenuAppProps) {
       L.push('')
       L.push(`*TOTALE: €${totals.total.toFixed(2)}*`)
       L.push('')
-      L.push('Ritiro: ')
       const text = encodeURIComponent(L.join('\n'))
       const url = `https://wa.me/39${info.phoneRaw}?text=${text}`
       window.open(url, '_blank')
