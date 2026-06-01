@@ -70,6 +70,7 @@ img { display: block; max-width: 100%; }
   color: var(--yellow);
 }
 .nav-burger-icon { width: 36px; height: 36px; object-fit: contain; }
+.nav-mayo-text { height: 32px; width: auto; object-fit: contain; }
 
 /* ===== MAYO WORDMARK — lettera nera con bordo giallo esterno ===== */
 .mayo-wordmark {
@@ -839,6 +840,13 @@ img { display: block; max-width: 100%; }
   margin-bottom: 16px;
   -webkit-text-stroke: 16px var(--yellow);
   paint-order: stroke fill;
+}
+.footer-mayo-text {
+  height: 72px;
+  width: auto;
+  object-fit: contain;
+  margin-bottom: 16px;
+  display: block;
 }
 .footer-tag {
   font-family: var(--font-marker);

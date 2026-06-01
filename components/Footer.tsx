@@ -9,7 +9,8 @@ export default function Footer({ info }: FooterProps) {
     <footer className="footer">
       <div className="footer-inner">
         <div>
-          <div className="footer-brand-name mayo-wordmark">MAYO</div>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/mayo-text.png" alt="MAYO" className="footer-mayo-text" />
           <div className="footer-tag">a burger experience.</div>
         </div>
         <div>

@@ -10,7 +10,8 @@ export default function Nav({ cartCount, onOpenCart }: NavProps) {
         <a href="#top" className="nav-logo">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/mayo-burger.png" alt="" className="nav-burger-icon" />
-          <span className="mayo-wordmark">MAYO</span>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/mayo-text.png" alt="MAYO" className="nav-mayo-text" />
           <em className="nav-tag">A Burger Experience</em>
         </a>
         <div className="nav-spacer" />
