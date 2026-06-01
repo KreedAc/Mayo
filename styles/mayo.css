@@ -19,6 +19,7 @@
 
   --font-display: 'Bungee', 'Anton', system-ui, sans-serif;
   --font-shadow: 'Bungee Shade', 'Bungee', system-ui, sans-serif;
+  --font-wordmark: 'Luckiest Guy', 'Bungee', system-ui, sans-serif;
   --font-body: 'Archivo', 'Inter', system-ui, sans-serif;
   --font-marker: 'Permanent Marker', cursive;
   --font-mono: 'Space Mono', ui-monospace, monospace;
@@ -70,12 +71,13 @@ img { display: block; max-width: 100%; }
 }
 .nav-burger-icon { width: 36px; height: 36px; object-fit: contain; }
 
-/* ===== MAYO WORDMARK — yellow fill + black stroke ===== */
+/* ===== MAYO WORDMARK — Luckiest Guy, yellow fill, black stroke ===== */
 .mayo-wordmark {
-  font-family: var(--font-display);
+  font-family: var(--font-wordmark);
   color: var(--yellow);
-  -webkit-text-stroke: 2.5px #000;
+  -webkit-text-stroke: 2px #000;
   paint-order: stroke fill;
+  letter-spacing: 0.02em;
 }
 .nav-tag {
   font-family: var(--font-marker);
@@ -835,6 +837,7 @@ img { display: block; max-width: 100%; }
   line-height: 1;
   margin-bottom: 16px;
   -webkit-text-stroke: 5px #000;
+  paint-order: stroke fill;
 }
 .footer-tag {
   font-family: var(--font-marker);
