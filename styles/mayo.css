@@ -68,7 +68,7 @@ img { display: block; max-width: 100%; }
   letter-spacing: 0.04em;
   color: var(--yellow);
 }
-.nav-logo svg { width: 32px; height: 32px; }
+.nav-burger-icon { width: 36px; height: 36px; object-fit: contain; }
 
 /* ===== MAYO WORDMARK — yellow fill + black stroke ===== */
 .mayo-wordmark {

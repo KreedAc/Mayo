@@ -1,5 +1,3 @@
-import MayoMark from './MayoMark'
-
 interface NavProps {
   cartCount: number
   onOpenCart: () => void
@@ -10,7 +8,8 @@ export default function Nav({ cartCount, onOpenCart }: NavProps) {
     <nav className="nav">
       <div className="nav-inner">
         <a href="#top" className="nav-logo">
-          <MayoMark />
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/mayo-burger.png" alt="" className="nav-burger-icon" />
           <span className="mayo-wordmark">MAYO</span>
           <em className="nav-tag">A Burger Experience</em>
         </a>
