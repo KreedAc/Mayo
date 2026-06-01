@@ -1,6 +1,32 @@
-import type { MenuSection, MenuItem } from './types'
+import type { MenuSection, MenuItem, HeroBanner } from './types'
 import { MAYO_MENU, MAYO_HOURS, MAYO_INFO } from './data'
 import { supabase } from './supabase'
+
+const DEFAULT_BANNER: HeroBanner = {
+  line1: 'SMASH',
+  line2: 'IT.',
+  tagline:
+    'Smasheria di Lamezia Terme. Doppia patty pressata sulla piastra, crosta caramellata, pane brioche tostato al burro. Senza compromessi.',
+}
+
+async function fetchBanner(): Promise<HeroBanner> {
+  if (!supabase) return DEFAULT_BANNER
+  try {
+    const { data, error } = await supabase
+      .from('site_config')
+      .select('key, value')
+      .in('key', ['hero_line1', 'hero_line2', 'hero_tagline'])
+    if (error || !data?.length) return DEFAULT_BANNER
+    const map = Object.fromEntries(data.map((r: { key: string; value: string }) => [r.key, r.value]))
+    return {
+      line1: map['hero_line1'] || DEFAULT_BANNER.line1,
+      line2: map['hero_line2'] || DEFAULT_BANNER.line2,
+      tagline: map['hero_tagline'] || DEFAULT_BANNER.tagline,
+    }
+  } catch {
+    return DEFAULT_BANNER
+  }
+}
 
 interface SupabaseProduct {
   id: string
@@ -60,30 +86,34 @@ function transformToMenu(
 }
 
 export async function getMenu() {
-  if (supabase) {
-    try {
-      const [{ data: categories, error: catError }, { data: products, error: prodError }] =
-        await Promise.all([
-          supabase.from('categories').select('*').order('sort_order'),
-          supabase
-            .from('products')
-            .select('*, product_variants(*)')
-            .order('sort_order'),
-        ])
+  const [banner, menuResult] = await Promise.all([
+    fetchBanner(),
+    (async () => {
+      if (supabase) {
+        try {
+          const [{ data: categories, error: catError }, { data: products, error: prodError }] =
+            await Promise.all([
+              supabase.from('categories').select('*').order('sort_order'),
+              supabase
+                .from('products')
+                .select('*, product_variants(*)')
+                .order('sort_order'),
+            ])
 
-      if (!catError && !prodError && categories?.length && products) {
-        const menu = transformToMenu(
-          categories as SupabaseCategory[],
-          products as SupabaseProduct[]
-        )
-        if (menu.length) {
-          return { menu, info: MAYO_INFO, hours: MAYO_HOURS }
+          if (!catError && !prodError && categories?.length && products) {
+            const menu = transformToMenu(
+              categories as SupabaseCategory[],
+              products as SupabaseProduct[]
+            )
+            if (menu.length) return menu
+          }
+        } catch {
+          // fall through to static data
         }
       }
-    } catch {
-      // fall through to static data
-    }
-  }
+      return MAYO_MENU
+    })(),
+  ])
 
-  return { menu: MAYO_MENU, info: MAYO_INFO, hours: MAYO_HOURS }
+  return { menu: menuResult, info: MAYO_INFO, hours: MAYO_HOURS, banner }
 }

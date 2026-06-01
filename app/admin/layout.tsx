@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import '../../styles/mayo.css'
 import '../../styles/admin.css'
 
 export const metadata: Metadata = {

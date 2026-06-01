@@ -41,5 +41,11 @@ export interface SiteInfo {
   minOrder: number
 }
 
+export interface HeroBanner {
+  line1: string
+  line2: string
+  tagline: string
+}
+
 export type CartMap = Record<string, number>
 export type NotesMap = Record<string, string>

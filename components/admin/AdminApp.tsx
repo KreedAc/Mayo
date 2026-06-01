@@ -8,7 +8,7 @@ import Login from './Login'
 import Catalog from './Catalog'
 import ProductForm, { emptyDraft, draftFromItem } from './ProductForm'
 
-type View = 'catalog' | 'form'
+type View = 'catalog' | 'form' | 'banner'
 
 interface EditTarget {
   draft: ReturnType<typeof emptyDraft>
@@ -57,6 +57,12 @@ async function fetchCatalogFromSupabase(): Promise<MenuSection[] | null> {
   } catch { return null }
 }
 
+const DEFAULT_BANNER = {
+  line1: 'SMASH',
+  line2: 'IT.',
+  tagline: 'Smasheria di Lamezia Terme. Doppia patty pressata sulla piastra, crosta caramellata, pane brioche tostato al burro. Senza compromessi.',
+}
+
 export default function AdminApp() {
   const [authed, setAuthed] = useState(false)
   const [catalog, setCatalog] = useState<MenuSection[]>(MAYO_MENU)
@@ -68,11 +74,13 @@ export default function AdminApp() {
   const [toast, setToast] = useState<string | null>(null)
   const [confirmDel, setConfirmDel] = useState<ConfirmDel | null>(null)
   const toastRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const [banner, setBanner] = useState(DEFAULT_BANNER)
+  const [bannerSaving, setBannerSaving] = useState(false)
 
   useEffect(() => {
     if (!supabase) return
     supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session) { setAuthed(true); loadCatalog() }
+      if (session) { setAuthed(true); loadCatalog(); loadBanner() }
     })
   }, [])
 
@@ -88,7 +96,36 @@ export default function AdminApp() {
     toastRef.current = setTimeout(() => setToast(null), 2500)
   }, [])
 
-  const handleLogin = () => { setAuthed(true); loadCatalog() }
+  const loadBanner = async () => {
+    if (!supabase) return
+    const { data } = await supabase
+      .from('site_config')
+      .select('key, value')
+      .in('key', ['hero_line1', 'hero_line2', 'hero_tagline'])
+    if (data?.length) {
+      const map = Object.fromEntries(data.map((r: { key: string; value: string }) => [r.key, r.value]))
+      setBanner({
+        line1: map['hero_line1'] ?? DEFAULT_BANNER.line1,
+        line2: map['hero_line2'] ?? DEFAULT_BANNER.line2,
+        tagline: map['hero_tagline'] ?? DEFAULT_BANNER.tagline,
+      })
+    }
+  }
+
+  const saveBanner = async () => {
+    if (!supabase || bannerSaving) return
+    setBannerSaving(true)
+    const rows = [
+      { key: 'hero_line1', value: banner.line1 },
+      { key: 'hero_line2', value: banner.line2 },
+      { key: 'hero_tagline', value: banner.tagline },
+    ]
+    const { error } = await supabase.from('site_config').upsert(rows, { onConflict: 'key' })
+    setBannerSaving(false)
+    showToast(error ? 'ERRORE NEL SALVATAGGIO' : 'BANNER AGGIORNATO ✓')
+  }
+
+  const handleLogin = () => { setAuthed(true); loadCatalog(); loadBanner() }
 
   const logout = async () => {
     if (supabase) await supabase.auth.signOut()
@@ -298,6 +335,7 @@ export default function AdminApp() {
           <div className="admin-tabs">
             <button className={`admin-tab ${view === 'catalog' ? 'active' : ''}`} onClick={() => setView('catalog')}>Catalogo</button>
             <button className={`admin-tab ${view === 'form' ? 'active' : ''}`} onClick={startNew}>+ Aggiungi</button>
+            <button className={`admin-tab ${view === 'banner' ? 'active' : ''}`} onClick={() => setView('banner')}>Banner Mood</button>
           </div>
           <div className="admin-spacer" />
           <a className="admin-link" href="/" target="_blank" rel="noreferrer">Vedi sito ↗</a>
@@ -329,6 +367,55 @@ export default function AdminApp() {
             onCancel={() => setView('catalog')}
             onSave={saveProduct}
           />
+        )}
+        {view === 'banner' && (
+          <div className="banner-editor">
+            <div className="banner-editor-form">
+              <h2 className="banner-editor-title">Banner Mood</h2>
+              <p className="banner-editor-hint">Cambia il testo della hero page. Le prime due righe usano il font grande, la terza è il testo descrittivo.</p>
+              <div className="banner-field">
+                <label>Riga 1 <span className="banner-label-hint">(grande, giallo)</span></label>
+                <input
+                  className="banner-input"
+                  value={banner.line1}
+                  maxLength={20}
+                  onChange={(e) => setBanner((b) => ({ ...b, line1: e.target.value.toUpperCase() }))}
+                />
+              </div>
+              <div className="banner-field">
+                <label>Riga 2 <span className="banner-label-hint">(grande, giallo)</span></label>
+                <input
+                  className="banner-input"
+                  value={banner.line2}
+                  maxLength={20}
+                  onChange={(e) => setBanner((b) => ({ ...b, line2: e.target.value.toUpperCase() }))}
+                />
+              </div>
+              <div className="banner-field">
+                <label>Tagline <span className="banner-label-hint">(testo descrittivo)</span></label>
+                <textarea
+                  className="banner-input banner-textarea"
+                  value={banner.tagline}
+                  rows={3}
+                  onChange={(e) => setBanner((b) => ({ ...b, tagline: e.target.value }))}
+                />
+              </div>
+              <button className="btn-save" onClick={saveBanner} disabled={bannerSaving}>
+                {bannerSaving ? 'SALVATAGGIO…' : 'SALVA BANNER'}
+              </button>
+            </div>
+
+            <div className="banner-preview">
+              <div className="banner-preview-label">ANTEPRIMA</div>
+              <div className="banner-preview-hero">
+                <h1 className="hero-title preview-hero-title">
+                  <span className="smash">{banner.line1 || 'SMASH'}</span>
+                  <span className="it">{banner.line2 || 'IT.'}</span>
+                </h1>
+                <p className="hero-sub preview-hero-sub">{banner.tagline}</p>
+              </div>
+            </div>
+          </div>
         )}
       </div>
 
