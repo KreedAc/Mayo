@@ -68,7 +68,15 @@ img { display: block; max-width: 100%; }
   letter-spacing: 0.04em;
   color: var(--yellow);
 }
-.nav-logo svg { width: 28px; height: 28px; }
+.nav-logo svg { width: 32px; height: 32px; }
+
+/* ===== MAYO WORDMARK — yellow fill + black stroke ===== */
+.mayo-wordmark {
+  font-family: var(--font-display);
+  color: var(--yellow);
+  -webkit-text-stroke: 2.5px #000;
+  paint-order: stroke fill;
+}
 .nav-tag {
   font-family: var(--font-marker);
   font-style: normal;
@@ -823,11 +831,10 @@ img { display: block; max-width: 100%; }
 }
 .footer ul { list-style: none; padding: 0; margin: 0; font-size: 14px; line-height: 2; }
 .footer-brand-name {
-  font-family: var(--font-shadow);
   font-size: 64px;
   line-height: 1;
-  color: var(--yellow);
   margin-bottom: 16px;
+  -webkit-text-stroke: 5px #000;
 }
 .footer-tag {
   font-family: var(--font-marker);

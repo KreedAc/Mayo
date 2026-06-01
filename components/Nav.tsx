@@ -11,7 +11,7 @@ export default function Nav({ cartCount, onOpenCart }: NavProps) {
       <div className="nav-inner">
         <a href="#top" className="nav-logo">
           <MayoMark />
-          <span>MAYO</span>
+          <span className="mayo-wordmark">MAYO</span>
           <em className="nav-tag">A Burger Experience</em>
         </a>
         <div className="nav-spacer" />

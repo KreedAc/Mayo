@@ -9,7 +9,7 @@ export default function Footer({ info }: FooterProps) {
     <footer className="footer">
       <div className="footer-inner">
         <div>
-          <div className="footer-brand-name">MAYO</div>
+          <div className="footer-brand-name mayo-wordmark">MAYO</div>
           <div className="footer-tag">a burger experience.</div>
         </div>
         <div>
