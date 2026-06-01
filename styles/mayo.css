@@ -19,7 +19,7 @@
 
   --font-display: 'Bungee', 'Anton', system-ui, sans-serif;
   --font-shadow: 'Bungee Shade', 'Bungee', system-ui, sans-serif;
-  --font-wordmark: 'Rubik', 'Bungee', system-ui, sans-serif;
+  --font-wordmark: 'Nunito', 'Bungee', system-ui, sans-serif;
   --font-body: 'Archivo', 'Inter', system-ui, sans-serif;
   --font-marker: 'Permanent Marker', cursive;
   --font-mono: 'Space Mono', ui-monospace, monospace;
@@ -71,22 +71,13 @@ img { display: block; max-width: 100%; }
 }
 .nav-burger-icon { width: 36px; height: 36px; object-fit: contain; }
 
-/* ===== MAYO WORDMARK — Rubik 900, nero + alone giallo + bordo nero ===== */
+/* ===== MAYO WORDMARK — lettera nera con bordo giallo esterno ===== */
 .mayo-wordmark {
   font-family: var(--font-wordmark);
   font-weight: 900;
   color: #000;
-  /* alone giallo (layer 1) + bordo nero esterno (layer 2) */
-  text-shadow:
-    0 0 0 #000,
-    -4px -4px 0 var(--yellow),  4px -4px 0 var(--yellow),
-    -4px  4px 0 var(--yellow),  4px  4px 0 var(--yellow),
-    -5px  0   0 var(--yellow),   5px  0   0 var(--yellow),
-     0   -5px 0 var(--yellow),   0    5px 0 var(--yellow),
-    -6px -6px 0 #000,  6px -6px 0 #000,
-    -6px  6px 0 #000,  6px  6px 0 #000,
-    -7px  0   0 #000,  7px  0   0 #000,
-     0   -7px 0 #000,  0    7px 0 #000;
+  -webkit-text-stroke: 6px var(--yellow);
+  paint-order: stroke fill;
   letter-spacing: 0.02em;
 }
 .nav-tag {
@@ -846,16 +837,8 @@ img { display: block; max-width: 100%; }
   font-size: 64px;
   line-height: 1;
   margin-bottom: 16px;
-  /* override text-shadow con valori più grandi per 64px */
-  text-shadow:
-    -8px -8px 0 var(--yellow),  8px -8px 0 var(--yellow),
-    -8px  8px 0 var(--yellow),  8px  8px 0 var(--yellow),
-    -10px 0   0 var(--yellow), 10px  0   0 var(--yellow),
-     0  -10px 0 var(--yellow),  0   10px 0 var(--yellow),
-    -12px -12px 0 #000, 12px -12px 0 #000,
-    -12px  12px 0 #000, 12px  12px 0 #000,
-    -14px  0    0 #000, 14px  0    0 #000,
-     0    -14px 0 #000,  0   14px  0 #000;
+  -webkit-text-stroke: 16px var(--yellow);
+  paint-order: stroke fill;
 }
 .footer-tag {
   font-family: var(--font-marker);
