@@ -13,6 +13,7 @@ export default function Hero({ banner }: HeroProps) {
             <span className="smash">{banner.line1}</span>
             <span className="it">{banner.line2}</span>
           </h1>
+          {banner.tagline.trim() && <p className="hero-sub">{banner.tagline}</p>}
           <div className="hero-meta">
             <span className="chip yellow">★ Since 2023</span>
           </div>
