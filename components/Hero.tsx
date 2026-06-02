@@ -13,12 +13,8 @@ export default function Hero({ banner }: HeroProps) {
             <span className="smash">{banner.line1}</span>
             <span className="it">{banner.line2}</span>
           </h1>
-          <p className="hero-sub">{banner.tagline}</p>
           <div className="hero-meta">
             <span className="chip yellow">★ Since 2023</span>
-            <span className="chip">Smash Burger</span>
-            <span className="chip">Lamezia Terme</span>
-            <span className="chip">100% Manzo CAL</span>
           </div>
           <div className="hero-cta">
             <a href="#sec-burgers" className="btn primary">VEDI I BURGER →</a>
