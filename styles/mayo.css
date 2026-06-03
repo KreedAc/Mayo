@@ -809,8 +809,15 @@ img { display: block; max-width: 100%; }
   font-family: var(--font-mono);
   font-size: 14px;
 }
-.hours-grid .day { color: var(--ink); }
-.hours-grid .time { color: var(--yellow); text-align: right; }
+.hours-grid .day { color: var(--ink); align-self: start; padding-top: 1px; }
+.hours-grid .time {
+  color: var(--yellow);
+  text-align: right;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.hours-grid .closed-time { color: var(--ink-dim); }
 .hours-grid .day.closed { color: var(--ink-dim); text-decoration: line-through; }
 
 /* ===== FOOTER ===== */

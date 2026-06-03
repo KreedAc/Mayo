@@ -6,9 +6,15 @@ interface InfoProps {
   info: SiteInfo
 }
 
-function formatSlots(entry: HoursEntry): string {
-  if (entry.closed || !entry.slots?.length) return 'Chiuso'
-  return entry.slots.map((s) => `${s.open} — ${s.close}`).join(' · ')
+function renderSlots(entry: HoursEntry) {
+  if (entry.closed || !entry.slots?.length) return <span className="time closed-time">Chiuso</span>
+  return (
+    <span className="time">
+      {entry.slots.map((s, i) => (
+        <span key={i} className="time-slot">{s.open} — {s.close}</span>
+      ))}
+    </span>
+  )
 }
 
 export default function Info({ hours, info }: InfoProps) {
@@ -47,7 +53,7 @@ export default function Info({ hours, info }: InfoProps) {
               {hours.map((h) => (
                 <React.Fragment key={h.day}>
                   <span className={`day ${h.closed ? 'closed' : ''}`}>{h.day}</span>
-                  <span className="time">{formatSlots(h)}</span>
+                  {renderSlots(h)}
                 </React.Fragment>
               ))}
             </div>

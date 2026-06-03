@@ -53,7 +53,7 @@ function buildSlots(hours: HoursEntry[], closures: ClosureEntry[]): string[] {
     const start = sh * 60 + sm
     let end = eh * 60 + em
     if (end <= start) end += 24 * 60
-    for (let t = start; t <= end - 30; t += 15) {
+    for (let t = start; t <= end; t += 15) {
       if (t < nowMin + 20) continue
       const hh = Math.floor(t / 60) % 24
       const mm = t % 60
