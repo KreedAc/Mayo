@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useRef, useMemo, useCallback } from 'react'
-import type { MenuSection, MenuItem, MenuVariant, SiteInfo, HoursEntry, CartMap, NotesMap, HeroBanner } from '@/lib/types'
+import type { MenuSection, MenuItem, MenuVariant, SiteInfo, HoursEntry, ClosureEntry, CartMap, NotesMap, HeroBanner } from '@/lib/types'
 import Nav from './Nav'
 import Hero from './Hero'
 import Marquee from './Marquee'
@@ -15,6 +15,7 @@ interface MenuAppProps {
   menu: MenuSection[]
   info: SiteInfo
   hours: HoursEntry[]
+  closures: ClosureEntry[]
   banner: HeroBanner
 }
 
@@ -32,7 +33,7 @@ function readLocal<T>(key: string, fallback: T): T {
   } catch { return fallback }
 }
 
-export default function MenuApp({ menu, info, hours, banner }: MenuAppProps) {
+export default function MenuApp({ menu, info, hours, closures, banner }: MenuAppProps) {
   const menuFlat = useMemo(() => {
     const f: Record<string, { name: string; variantLabel: string; price: number }> = {}
     menu.forEach((s) =>
@@ -231,6 +232,8 @@ export default function MenuApp({ menu, info, hours, banner }: MenuAppProps) {
         onCheckout={checkout}
         onClear={() => { setCart({}); setNotes({}); setPickupTime(''); showToast('CARRELLO SVUOTATO') }}
         info={info}
+        hours={hours}
+        closures={closures}
       />
 
       <div className={`toast ${toast ? 'show' : ''}`}>{toast}</div>

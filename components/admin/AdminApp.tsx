@@ -1,14 +1,16 @@
 'use client'
 
 import { useState, useEffect, useRef, useCallback } from 'react'
-import type { MenuSection, MenuItem } from '@/lib/types'
+import type { MenuSection, MenuItem, HoursEntry, ClosureEntry } from '@/lib/types'
+import { MAYO_HOURS, DEFAULT_CLOSURES } from '@/lib/data'
 import { supabase } from '@/lib/supabase'
 import { MAYO_MENU } from '@/lib/data'
 import Login from './Login'
 import Catalog from './Catalog'
 import ProductForm, { emptyDraft, draftFromItem } from './ProductForm'
+import HoursEditor from './HoursEditor'
 
-type View = 'catalog' | 'form' | 'banner'
+type View = 'catalog' | 'form' | 'banner' | 'hours'
 
 interface EditTarget {
   draft: ReturnType<typeof emptyDraft>
@@ -76,11 +78,13 @@ export default function AdminApp() {
   const toastRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const [banner, setBanner] = useState(DEFAULT_BANNER)
   const [bannerSaving, setBannerSaving] = useState(false)
+  const [adminHours, setAdminHours] = useState<HoursEntry[]>(MAYO_HOURS)
+  const [adminClosures, setAdminClosures] = useState<ClosureEntry[]>(DEFAULT_CLOSURES)
 
   useEffect(() => {
     if (!supabase) return
     supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session) { setAuthed(true); loadCatalog(); loadBanner() }
+      if (session) { setAuthed(true); loadCatalog(); loadBanner(); loadHours() }
     })
   }, [])
 
@@ -95,6 +99,24 @@ export default function AdminApp() {
     if (toastRef.current) clearTimeout(toastRef.current)
     toastRef.current = setTimeout(() => setToast(null), 2500)
   }, [])
+
+  const loadHours = async () => {
+    if (!supabase) return
+    const { data } = await supabase
+      .from('site_config')
+      .select('key, value')
+      .in('key', ['weekly_hours', 'closures'])
+    if (data?.length) {
+      for (const row of data as { key: string; value: string }[]) {
+        if (row.key === 'weekly_hours') {
+          try { setAdminHours(JSON.parse(row.value)) } catch { /* keep default */ }
+        }
+        if (row.key === 'closures') {
+          try { setAdminClosures(JSON.parse(row.value)) } catch { /* keep default */ }
+        }
+      }
+    }
+  }
 
   const loadBanner = async () => {
     if (!supabase) return
@@ -125,7 +147,7 @@ export default function AdminApp() {
     showToast(error ? 'ERRORE NEL SALVATAGGIO' : 'BANNER AGGIORNATO ✓')
   }
 
-  const handleLogin = () => { setAuthed(true); loadCatalog(); loadBanner() }
+  const handleLogin = () => { setAuthed(true); loadCatalog(); loadBanner(); loadHours() }
 
   const logout = async () => {
     if (supabase) await supabase.auth.signOut()
@@ -336,6 +358,7 @@ export default function AdminApp() {
             <button className={`admin-tab ${view === 'catalog' ? 'active' : ''}`} onClick={() => setView('catalog')}>Catalogo</button>
             <button className={`admin-tab ${view === 'form' ? 'active' : ''}`} onClick={startNew}>+ Aggiungi</button>
             <button className={`admin-tab ${view === 'banner' ? 'active' : ''}`} onClick={() => setView('banner')}>Banner Mood</button>
+            <button className={`admin-tab ${view === 'hours' ? 'active' : ''}`} onClick={() => setView('hours')}>Orari</button>
           </div>
           <div className="admin-spacer" />
           <a className="admin-link" href="/" target="_blank" rel="noreferrer">Vedi sito ↗</a>
@@ -416,6 +439,13 @@ export default function AdminApp() {
               </div>
             </div>
           </div>
+        )}
+        {view === 'hours' && (
+          <HoursEditor
+            hours={adminHours}
+            closures={adminClosures}
+            onToast={showToast}
+          />
         )}
       </div>
 

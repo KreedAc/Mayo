@@ -145,14 +145,16 @@ export const MAYO_MENU: MenuSection[] = [
 ]
 
 export const MAYO_HOURS: HoursEntry[] = [
-  { day: 'Lunedì', time: 'Chiuso', closed: true },
-  { day: 'Martedì', time: '18:30 — 23:30' },
-  { day: 'Mercoledì', time: '18:30 — 23:30' },
-  { day: 'Giovedì', time: '18:30 — 23:30' },
-  { day: 'Venerdì', time: '18:30 — 00:30' },
-  { day: 'Sabato', time: '18:30 — 00:30' },
-  { day: 'Domenica', time: '18:30 — 23:30' },
+  { day: 'Lunedì', closed: true, slots: [] },
+  { day: 'Martedì',   slots: [{ open: '12:30', close: '14:30' }, { open: '18:30', close: '23:30' }] },
+  { day: 'Mercoledì', slots: [{ open: '12:30', close: '14:30' }, { open: '18:30', close: '23:30' }] },
+  { day: 'Giovedì',   slots: [{ open: '12:30', close: '14:30' }, { open: '18:30', close: '23:30' }] },
+  { day: 'Venerdì',   slots: [{ open: '12:30', close: '14:30' }, { open: '18:30', close: '00:30' }] },
+  { day: 'Sabato',    slots: [{ open: '18:30', close: '00:30' }] },
+  { day: 'Domenica',  slots: [{ open: '18:30', close: '23:30' }] },
 ]
+
+export const DEFAULT_CLOSURES: import('./types').ClosureEntry[] = []
 
 export const MAYO_INFO: SiteInfo = {
   address: 'Via Gesualdo Scardamaglia, 20',

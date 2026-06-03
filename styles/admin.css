@@ -490,6 +490,161 @@
 }
 .sync-banner strong { font-weight: 900; letter-spacing: .04em; }
 
+/* ===== HOURS EDITOR ===== */
+.hours-editor {
+  max-width: 680px;
+  padding: 40px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 56px;
+}
+.he-section {}
+.he-title {
+  font-family: var(--font-display);
+  font-size: 20px;
+  letter-spacing: 0.1em;
+  color: var(--yellow);
+  margin: 0 0 6px;
+}
+.he-hint {
+  font-size: 13px;
+  color: var(--ink-dim);
+  margin: 0 0 24px;
+  line-height: 1.6;
+}
+.he-days { display: flex; flex-direction: column; gap: 4px; margin-bottom: 28px; }
+.he-day-row {
+  border: 1.5px solid var(--line);
+  background: var(--bg-2);
+  padding: 12px 16px;
+  transition: border-color 0.12s;
+}
+.he-day-row:not(.he-day-closed):hover { border-color: var(--yellow-dim); }
+.he-day-closed { opacity: 0.5; }
+.he-day-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.he-day-name {
+  font-family: var(--font-display);
+  font-size: 14px;
+  letter-spacing: 0.08em;
+  color: var(--ink);
+}
+.he-toggle {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  padding: 5px 12px;
+  border: 1.5px solid var(--line);
+  transition: all 0.12s;
+}
+.he-toggle-open { border-color: var(--green); color: var(--green); }
+.he-toggle-closed { border-color: var(--line); color: var(--ink-dim); }
+.he-toggle:hover { opacity: 0.75; }
+.he-slots { margin-top: 10px; display: flex; flex-direction: column; gap: 6px; }
+.he-slot {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.he-time-input {
+  background: var(--bg-3);
+  border: 1.5px solid var(--line);
+  color: var(--ink);
+  font-family: var(--font-mono);
+  font-size: 13px;
+  padding: 6px 10px;
+  width: 100px;
+  outline: none;
+}
+.he-time-input:focus { border-color: var(--yellow); }
+.he-arrow { color: var(--ink-dim); font-size: 12px; }
+.he-remove-slot {
+  font-size: 18px;
+  color: var(--ink-dim);
+  padding: 0 6px;
+  line-height: 1;
+  transition: color 0.12s;
+}
+.he-remove-slot:hover { color: var(--red); }
+.he-add-slot {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  color: var(--yellow-dim);
+  text-decoration: underline;
+  padding: 4px 0;
+  text-align: left;
+  transition: color 0.12s;
+}
+.he-add-slot:hover { color: var(--yellow); }
+.he-save { margin-top: 4px; }
+
+/* Closures */
+.he-closure-form { display: flex; flex-direction: column; gap: 12px; margin-bottom: 24px; }
+.he-closure-input {
+  width: 100%;
+  background: var(--bg-3);
+  border: 1.5px solid var(--line);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 14px;
+  padding: 9px 14px;
+  outline: none;
+}
+.he-closure-input:focus { border-color: var(--yellow); }
+.he-closure-dates {
+  display: flex;
+  align-items: flex-end;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.he-date-label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-dim);
+}
+.he-date-input {
+  background: var(--bg-3);
+  border: 1.5px solid var(--line);
+  color: var(--ink);
+  font-family: var(--font-mono);
+  font-size: 13px;
+  padding: 7px 10px;
+  outline: none;
+  color-scheme: dark;
+}
+.he-date-input:focus { border-color: var(--yellow); }
+.he-closure-add { padding: 9px 18px; font-size: 12px; }
+.he-empty { font-size: 13px; color: var(--ink-dim); font-style: italic; }
+.he-closure-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 6px; }
+.he-closure-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--bg-2);
+  border: 1.5px solid var(--line);
+  padding: 12px 16px;
+}
+.he-closure-info { display: flex; flex-direction: column; gap: 2px; }
+.he-closure-label { font-size: 14px; font-weight: 700; color: var(--ink); }
+.he-closure-range { font-family: var(--font-mono); font-size: 11px; color: var(--ink-dim); }
+.he-closure-delete {
+  font-size: 20px;
+  line-height: 1;
+  color: var(--ink-dim);
+  padding: 0 6px;
+  transition: color 0.12s;
+}
+.he-closure-delete:hover { color: var(--red); }
+
 /* ===== BANNER MOOD EDITOR ===== */
 .banner-editor {
   display: grid;

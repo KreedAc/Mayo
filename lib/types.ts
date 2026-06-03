@@ -24,10 +24,22 @@ export interface MenuSection {
   items: MenuItem[]
 }
 
+export interface HoursSlot {
+  open: string   // "18:30"
+  close: string  // "23:30"
+}
+
 export interface HoursEntry {
   day: string
-  time: string
   closed?: boolean
+  slots?: HoursSlot[]
+}
+
+export interface ClosureEntry {
+  id: string
+  label: string
+  from: string  // "YYYY-MM-DD"
+  to: string    // "YYYY-MM-DD"
 }
 
 export interface SiteInfo {

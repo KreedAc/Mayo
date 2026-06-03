@@ -1,8 +1,7 @@
 'use client'
 
 import { useState, useEffect, useMemo, useRef } from 'react'
-import type { CartMap, NotesMap, SiteInfo } from '@/lib/types'
-import { MAYO_HOURS } from '@/lib/data'
+import type { CartMap, NotesMap, SiteInfo, HoursEntry, ClosureEntry } from '@/lib/types'
 
 interface CartLine {
   key: string
@@ -29,28 +28,37 @@ interface CartProps {
   onCheckout: (lines: CartLine[], totals: { subtotal: number; total: number }) => void
   onClear: () => void
   info: SiteInfo
+  hours: HoursEntry[]
+  closures: ClosureEntry[]
 }
 
 type Step = 'name' | 'time' | 'ready'
 
-function buildSlots(): string[] {
+function buildSlots(hours: HoursEntry[], closures: ClosureEntry[]): string[] {
+  // Check special closures (single day or range)
+  const todayStr = new Date().toISOString().slice(0, 10)
+  if (closures.some((c) => todayStr >= c.from && todayStr <= c.to)) return []
+
   const dayNames = ['Domenica', 'Lunedì', 'Martedì', 'Mercoledì', 'Giovedì', 'Venerdì', 'Sabato']
-  const entry = MAYO_HOURS.find((h) => h.day === dayNames[new Date().getDay()])
-  if (!entry || entry.closed || !entry.time) return []
-  const m = entry.time.match(/(\d{1,2}):(\d{2})\s*[—-]\s*(\d{1,2}):(\d{2})/)
-  if (!m) return []
-  const [sh, sm, eh, em] = [m[1], m[2], m[3], m[4]].map(Number)
-  const start = sh * 60 + sm
-  let end = eh * 60 + em
-  if (end <= start) end += 24 * 60
+  const entry = hours.find((h) => h.day === dayNames[new Date().getDay()])
+  if (!entry || entry.closed || !entry.slots?.length) return []
+
   const now = new Date()
   const nowMin = now.getHours() * 60 + now.getMinutes()
   const slots: string[] = []
-  for (let t = start; t <= end - 30; t += 15) {
-    if (t < nowMin + 20) continue
-    const hh = Math.floor(t / 60) % 24
-    const mm = t % 60
-    slots.push(`${String(hh).padStart(2, '0')}:${String(mm).padStart(2, '0')}`)
+
+  for (const slot of entry.slots) {
+    const [sh, sm] = slot.open.split(':').map(Number)
+    const [eh, em] = slot.close.split(':').map(Number)
+    const start = sh * 60 + sm
+    let end = eh * 60 + em
+    if (end <= start) end += 24 * 60
+    for (let t = start; t <= end - 30; t += 15) {
+      if (t < nowMin + 20) continue
+      const hh = Math.floor(t / 60) % 24
+      const mm = t % 60
+      slots.push(`${String(hh).padStart(2, '0')}:${String(mm).padStart(2, '0')}`)
+    }
   }
   return slots
 }
@@ -63,7 +71,7 @@ function initStep(custName: string, pickupTime: string): Step {
 
 export default function Cart({
   open, onClose, cart, notes, custName, pickupTime, menuFlat,
-  onInc, onDec, onNote, onName, onTime, onCheckout, onClear, info,
+  onInc, onDec, onNote, onName, onTime, onCheckout, onClear, info, hours, closures,
 }: CartProps) {
   const lines: CartLine[] = Object.keys(cart)
     .filter((id) => cart[id] > 0)
@@ -83,7 +91,7 @@ export default function Cart({
   const [step, setStep] = useState<Step>(() => initStep(custName, pickupTime))
   const [nameInput, setNameInput] = useState(custName || '')
   const nameRef = useRef<HTMLInputElement>(null)
-  const slots = useMemo(buildSlots, [])
+  const slots = useMemo(() => buildSlots(hours, closures), [hours, closures])
 
   // Reset on cart clear
   useEffect(() => {

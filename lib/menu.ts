@@ -1,5 +1,5 @@
-import type { MenuSection, MenuItem, HeroBanner } from './types'
-import { MAYO_MENU, MAYO_HOURS, MAYO_INFO } from './data'
+import type { MenuSection, MenuItem, HeroBanner, HoursEntry, ClosureEntry } from './types'
+import { MAYO_MENU, MAYO_HOURS, MAYO_INFO, DEFAULT_CLOSURES } from './data'
 import { supabase } from './supabase'
 
 const DEFAULT_BANNER: HeroBanner = {
@@ -25,6 +25,37 @@ async function fetchBanner(): Promise<HeroBanner> {
     }
   } catch {
     return DEFAULT_BANNER
+  }
+}
+
+async function fetchHours(): Promise<HoursEntry[]> {
+  if (!supabase) return MAYO_HOURS
+  try {
+    const { data, error } = await supabase
+      .from('site_config')
+      .select('value')
+      .eq('key', 'weekly_hours')
+      .single()
+    if (error || !data) return MAYO_HOURS
+    const parsed = JSON.parse(data.value) as HoursEntry[]
+    return parsed.length ? parsed : MAYO_HOURS
+  } catch {
+    return MAYO_HOURS
+  }
+}
+
+async function fetchClosures(): Promise<ClosureEntry[]> {
+  if (!supabase) return DEFAULT_CLOSURES
+  try {
+    const { data, error } = await supabase
+      .from('site_config')
+      .select('value')
+      .eq('key', 'closures')
+      .single()
+    if (error || !data) return DEFAULT_CLOSURES
+    return JSON.parse(data.value) as ClosureEntry[]
+  } catch {
+    return DEFAULT_CLOSURES
   }
 }
 
@@ -86,8 +117,10 @@ function transformToMenu(
 }
 
 export async function getMenu() {
-  const [banner, menuResult] = await Promise.all([
+  const [banner, hours, closures, menuResult] = await Promise.all([
     fetchBanner(),
+    fetchHours(),
+    fetchClosures(),
     (async () => {
       if (supabase) {
         try {
@@ -115,5 +148,5 @@ export async function getMenu() {
     })(),
   ])
 
-  return { menu: menuResult, info: MAYO_INFO, hours: MAYO_HOURS, banner }
+  return { menu: menuResult, info: MAYO_INFO, hours, closures, banner }
 }
