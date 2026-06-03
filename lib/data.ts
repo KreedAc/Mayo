@@ -113,7 +113,7 @@ export const MAYO_MENU: MenuSection[] = [
     items: [
       { id: 'annibale', name: 'ANNIBALE (13%)', desc: 'Cantina Le Moire. Greco Nero 100%. Fruttato fresco, frutti di bosco e more mature.', variants: [{ label: '75cl', price: 18.0 }], img: J+'img-0401-28996.jpg' },
       { id: 'shemale', name: 'SHEMALE (12.5%)', desc: 'Cantina Le Moire. Vino rosé, profumi di fragole e lamponi.', variants: [{ label: '75cl', price: 18.0 }], img: J+'img-0403-28998.jpg' },
-      { id: 'madre-goccia', name: 'MADRE GOCCIA (12.5%)', desc: 'Giallo paglierino, riflessi verdognoli. Floreale, albicocca secca, frutta esotica.', variants: [{ label: '75cl', price: 18.0 }], img: 'https://www.jmenu.it/media/upload/mayo/item-menu/menu-digitale-jmenu-madre-goccia-18010.jpg' },
+      { id: 'madre-goccia', name: 'MADRE GOCCIA (12.5%)', desc: 'Giallo paglierino, riflessi verdognoli. Floreale, albicocca secca, frutta esotica.', variants: [{ label: '75cl', price: 18.0 }] },
     ],
   },
   {
@@ -125,7 +125,7 @@ export const MAYO_MENU: MenuSection[] = [
       { id: 'mountain-dew', name: 'MOUNTAIN DEW', desc: 'Bevanda gassata al gusto di limone, USA 1940.', variants: [{ label: '33cl', price: 3.0 }], img: J+'img-8480-25604.jpg' },
       { id: 'fanta-blue', name: 'FANTA BLUE BERRY', desc: 'Fanta gusto frutti di bosco.', variants: [{ label: '35,5cl', price: 3.0 }], img: J+'img-6436-21324.jpg' },
       { id: 'fanta-straw', name: 'FANTA STRAWBERRY', desc: 'Fanta gusto fragola.', variants: [{ label: '35,5cl', price: 3.0 }], img: J+'img-6438-21328.jpg' },
-      { id: 'fanta-grape', name: 'FANTA GRAPE', desc: 'Fanta gusto uva.', variants: [{ label: '35,5cl', price: 3.0 }], img: 'https://www.jmenu.it/media/upload/mayo/item-menu/menu-digitale-jmenu-img-6443-21330.jpg' },
+      { id: 'fanta-grape', name: 'FANTA GRAPE', desc: 'Fanta gusto uva.', variants: [{ label: '35,5cl', price: 3.0 }] },
       { id: 'dr-pepper', name: 'DR PEPPER VANILLA', desc: '', variants: [{ label: '33cl', price: 3.0 }], img: J+'photoroom-20251202-174240-29690.jpg' },
     ],
   },
@@ -133,13 +133,13 @@ export const MAYO_MENU: MenuSection[] = [
     id: 'bevande', label: 'Bevande', emoji: '🥤',
     blurb: 'Soft drink classici.',
     items: [
-      { id: 'acqua', name: 'ACQUA', desc: 'Naturale o frizzante.', variants: [{ label: '50cl', price: 1.0 }], img: 'https://www.jmenu.it/media/upload/mayo/item-menu/menu-digitale-jmenu-img-7741-23980.jpg' },
+      { id: 'acqua', name: 'ACQUA', desc: 'Naturale o frizzante.', variants: [{ label: '50cl', price: 1.0 }] },
       { id: 'coca-zero', name: 'COCA-COLA ZERO', desc: 'Lattina.', variants: [{ label: '33cl', price: 2.0 }], img: J+'img-6366-21300.jpg' },
-      { id: 'fanta', name: 'FANTA', desc: 'Lattina.', variants: [{ label: '33cl', price: 2.0 }], img: 'https://www.jmenu.it/media/upload/mayo/item-menu/menu-digitale-jmenu-img-6369-21297.jpg' },
+      { id: 'fanta', name: 'FANTA', desc: 'Lattina.', variants: [{ label: '33cl', price: 2.0 }] },
       { id: 'sprite', name: 'SPRITE', desc: 'Lattina.', variants: [{ label: '33cl', price: 2.0 }], img: J+'img-8354-25274.jpg' },
-      { id: 'spezi', name: 'SPEZI', desc: 'Effervescente: cola, aranciata, limonata.', variants: [{ label: '33cl', price: 3.0 }], img: 'https://www.jmenu.it/media/upload/mayo/item-menu/menu-digitale-jmenu-img-8485-25605.jpg' },
-      { id: 'brasilena', name: 'BRASILENA', desc: 'Vetro.', price: 2.0, img: 'https://www.jmenu.it/media/upload/mayo/item-menu/menu-digitale-jmenu-img-6375-21302.jpg' },
-      { id: 'estathe', name: "ESTATHE' PESCA/LIMONE", desc: 'Lattina.', variants: [{ label: '33cl', price: 2.0 }], img: 'https://www.jmenu.it/media/upload/mayo/item-menu/menu-digitale-jmenu-img-6372-21301.jpg' },
+      { id: 'spezi', name: 'SPEZI', desc: 'Effervescente: cola, aranciata, limonata.', variants: [{ label: '33cl', price: 3.0 }] },
+      { id: 'brasilena', name: 'BRASILENA', desc: 'Vetro.', price: 2.0 },
+      { id: 'estathe', name: "ESTATHE' PESCA/LIMONE", desc: 'Lattina.', variants: [{ label: '33cl', price: 2.0 }] },
     ],
   },
 ]

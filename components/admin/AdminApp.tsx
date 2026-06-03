@@ -205,7 +205,8 @@ export default function AdminApp() {
     setMigrating(true)
     showToast('MIGRAZIONE IN CORSO…')
     const BUCKET = 'product-images'
-    const OLD_BASE = 'https://www.jmenu.it/media/cache/mayo/item-menu/800x600/menu-digitale-jmenu-'
+    const JMENU_CACHE = 'https://www.jmenu.it/media/cache/mayo/item-menu/800x600/menu-digitale-jmenu-'
+    const JMENU_UPLOAD = 'https://www.jmenu.it/media/upload/mayo/item-menu/'
 
     // Collect unique image URLs from static catalog
     const urls = [...new Set(MAYO_MENU.flatMap((s) => s.items.map((i) => i.img).filter(Boolean) as string[]))]
@@ -223,21 +224,25 @@ export default function AdminApp() {
       } catch { fail++ }
     }
 
-    if (ok > 0) {
-      // Update image_url in DB for all products still pointing to jmenu.it
-      const { data: prods } = await supabase.from('products').select('id, image_url')
-      for (const p of prods || []) {
-        if (p.image_url?.startsWith(OLD_BASE)) {
-          const filename = p.image_url.replace(OLD_BASE, '')
-          const { data: { publicUrl } } = supabase.storage.from(BUCKET).getPublicUrl(filename)
-          await supabase.from('products').update({ image_url: publicUrl }).eq('id', p.id)
-        }
+    // Update DB: replace old jmenu cache URLs with Supabase Storage URLs
+    //            and null-out unreachable jmenu upload URLs
+    const { data: prods } = await supabase.from('products').select('id, image_url')
+    for (const p of prods || []) {
+      const url: string | null = p.image_url
+      if (!url) continue
+      if (url.startsWith(JMENU_CACHE)) {
+        const filename = url.replace(JMENU_CACHE, '')
+        const { data: { publicUrl } } = supabase.storage.from(BUCKET).getPublicUrl(filename)
+        await supabase.from('products').update({ image_url: publicUrl }).eq('id', p.id)
+      } else if (url.startsWith(JMENU_UPLOAD) || url.includes('jmenu.it')) {
+        // Unreachable — clear to avoid broken images
+        await supabase.from('products').update({ image_url: null }).eq('id', p.id)
       }
-      await loadCatalog()
     }
 
+    await loadCatalog()
     setMigrating(false)
-    showToast(fail === 0 ? `${ok} IMMAGINI MIGRATE ✓` : `${ok} OK · ${fail} FALLITE (CORS?)`)
+    showToast(fail === 0 ? `${ok} IMMAGINI MIGRATE ✓` : `${ok} MIGRATE · ${fail} RIMOSSE (non raggiungibili)`)
   }
 
   const startNew = () => {
