@@ -9,53 +9,41 @@ const DEFAULT_BANNER: HeroBanner = {
     'Smasheria di Lamezia Terme. Doppia patty pressata sulla piastra, crosta caramellata, pane brioche tostato al burro. Senza compromessi.',
 }
 
-async function fetchBanner(): Promise<HeroBanner> {
-  if (!supabase) return DEFAULT_BANNER
+interface SiteConfigResult {
+  banner: HeroBanner
+  hours: HoursEntry[]
+  closures: ClosureEntry[]
+}
+
+async function fetchSiteConfig(): Promise<SiteConfigResult> {
+  if (!supabase) return { banner: DEFAULT_BANNER, hours: MAYO_HOURS, closures: DEFAULT_CLOSURES }
   try {
     const { data, error } = await supabase
       .from('site_config')
       .select('key, value')
-      .in('key', ['hero_line1', 'hero_line2', 'hero_tagline'])
-    if (error || !data?.length) return DEFAULT_BANNER
+    if (error || !data?.length) return { banner: DEFAULT_BANNER, hours: MAYO_HOURS, closures: DEFAULT_CLOSURES }
     const map = Object.fromEntries(data.map((r: { key: string; value: string }) => [r.key, r.value]))
-    return {
+
+    const banner: HeroBanner = {
       line1: map['hero_line1'] || DEFAULT_BANNER.line1,
       line2: map['hero_line2'] || DEFAULT_BANNER.line2,
-      tagline: map['hero_tagline'] || DEFAULT_BANNER.tagline,
+      tagline: map['hero_tagline'] ?? DEFAULT_BANNER.tagline,
     }
-  } catch {
-    return DEFAULT_BANNER
-  }
-}
 
-async function fetchHours(): Promise<HoursEntry[]> {
-  if (!supabase) return MAYO_HOURS
-  try {
-    const { data, error } = await supabase
-      .from('site_config')
-      .select('value')
-      .eq('key', 'weekly_hours')
-      .single()
-    if (error || !data) return MAYO_HOURS
-    const parsed = JSON.parse(data.value) as HoursEntry[]
-    return parsed.length ? parsed : MAYO_HOURS
-  } catch {
-    return MAYO_HOURS
-  }
-}
+    let hours = MAYO_HOURS
+    try {
+      const parsed = JSON.parse(map['weekly_hours'] ?? '[]') as HoursEntry[]
+      if (parsed.length) hours = parsed
+    } catch { /* keep default */ }
 
-async function fetchClosures(): Promise<ClosureEntry[]> {
-  if (!supabase) return DEFAULT_CLOSURES
-  try {
-    const { data, error } = await supabase
-      .from('site_config')
-      .select('value')
-      .eq('key', 'closures')
-      .single()
-    if (error || !data) return DEFAULT_CLOSURES
-    return JSON.parse(data.value) as ClosureEntry[]
+    let closures = DEFAULT_CLOSURES
+    try {
+      closures = JSON.parse(map['closures'] ?? '[]') as ClosureEntry[]
+    } catch { /* keep default */ }
+
+    return { banner, hours, closures }
   } catch {
-    return DEFAULT_CLOSURES
+    return { banner: DEFAULT_BANNER, hours: MAYO_HOURS, closures: DEFAULT_CLOSURES }
   }
 }
 
@@ -117,10 +105,8 @@ function transformToMenu(
 }
 
 export async function getMenu() {
-  const [banner, hours, closures, menuResult] = await Promise.all([
-    fetchBanner(),
-    fetchHours(),
-    fetchClosures(),
+  const [{ banner, hours, closures }, menuResult] = await Promise.all([
+    fetchSiteConfig(),
     (async () => {
       if (supabase) {
         try {
