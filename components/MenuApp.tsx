@@ -188,6 +188,9 @@ export default function MenuApp({ menu, info, hours, closures, banner }: MenuApp
         </div>
       )}
       <Nav cartCount={cartCount} onOpenCart={() => setCartOpen(true)} />
+      <div className="order-nudge">
+        🛍 Vuoi ordinare in asporto? Aggiungi i prodotti al carrello e completa l&apos;ordine via WhatsApp.
+      </div>
       <Hero banner={banner} />
       <Marquee items={MARQUEE_ITEMS} />
 
