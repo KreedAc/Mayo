@@ -63,6 +63,8 @@ export default function MenuApp({ menu, info, hours, closures, banner }: MenuApp
 
   const [cartOpen, setCartOpen] = useState(false)
   const [toast, setToast] = useState<string | null>(null)
+  const [nudge, setNudge] = useState(true)
+  useEffect(() => { const t = setTimeout(() => setNudge(false), 10000); return () => clearTimeout(t) }, [])
   const toastRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   const cartCount = Object.values(cart).reduce((s, v) => s + v, 0)
@@ -188,9 +190,11 @@ export default function MenuApp({ menu, info, hours, closures, banner }: MenuApp
         </div>
       )}
       <Nav cartCount={cartCount} onOpenCart={() => setCartOpen(true)} />
-      <div className="order-nudge">
-        🛍 Vuoi ordinare in asporto? Aggiungi i prodotti al carrello e completa l&apos;ordine via WhatsApp.
-      </div>
+      {nudge && (
+        <div className="order-nudge">
+          🛍 Vuoi ordinare in asporto? Aggiungi i prodotti al carrello e completa l&apos;ordine via WhatsApp.
+        </div>
+      )}
       <Hero banner={banner} />
       <Marquee items={MARQUEE_ITEMS} />
 

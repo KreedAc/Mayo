@@ -136,6 +136,10 @@ img { display: block; max-width: 100%; }
   letter-spacing: 0.03em;
   padding: 9px 16px;
   line-height: 1.4;
+  animation: nudge-out 0.5s ease 9.5s forwards;
+}
+@keyframes nudge-out {
+  to { opacity: 0; max-height: 0; padding: 0; }
 }
 
 /* ===== HERO ===== */
