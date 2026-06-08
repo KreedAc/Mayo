@@ -1,13 +1,13 @@
 'use client'
 
 import { useState, useEffect, useRef, useMemo, useCallback } from 'react'
-import type { MenuSection, MenuItem, MenuVariant, SiteInfo, HoursEntry, ClosureEntry, CartMap, NotesMap, HeroBanner } from '@/lib/types'
+import type { MenuSection, MenuItem, MenuVariant, SiteInfo, HoursEntry, ClosureEntry, Cart, CartItem, HeroBanner } from '@/lib/types'
 import Nav from './Nav'
 import Hero from './Hero'
 import Marquee from './Marquee'
 import CategoryTabs from './CategoryTabs'
 import MenuSectionComp from './MenuSection'
-import Cart from './Cart'
+import CartComp from './Cart'
 import Info from './Info'
 import Footer from './Footer'
 
@@ -47,11 +47,8 @@ export default function MenuApp({ menu, info, hours, closures, banner }: MenuApp
     return f
   }, [menu])
 
-  const [cart, setCart] = useState<CartMap>(() => readLocal('mayo-cart', {}))
+  const [cart, setCart] = useState<Cart>(() => readLocal('mayo-cart', []))
   useEffect(() => { localStorage.setItem('mayo-cart', JSON.stringify(cart)) }, [cart])
-
-  const [notes, setNotes] = useState<NotesMap>(() => readLocal('mayo-cart-notes', {}))
-  useEffect(() => { localStorage.setItem('mayo-cart-notes', JSON.stringify(notes)) }, [notes])
 
   const [custName, setCustName] = useState<string>(() => {
     if (typeof window === 'undefined') return ''
@@ -67,7 +64,7 @@ export default function MenuApp({ menu, info, hours, closures, banner }: MenuApp
   useEffect(() => { const t = setTimeout(() => setNudge(false), 10000); return () => clearTimeout(t) }, [])
   const toastRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
-  const cartCount = Object.values(cart).reduce((s, v) => s + v, 0)
+  const cartCount = cart.length
 
   const showToast = useCallback((msg: string) => {
     setToast(msg)
@@ -76,54 +73,70 @@ export default function MenuApp({ menu, info, hours, closures, banner }: MenuApp
   }, [])
 
   const addItem = useCallback((item: MenuItem, variant: MenuVariant) => {
-    const key = `${item.id}::${variant.label || ''}`
-    setCart((c) => ({ ...c, [key]: (c[key] || 0) + 1 }))
+    const productKey = `${item.id}::${variant.label || ''}`
+    const newItem: CartItem = { id: crypto.randomUUID(), productKey, note: '' }
+    setCart((c) => [...c, newItem])
     const variantStr = variant.label ? ` (${variant.label})` : ''
     showToast(`+ ${item.name.toUpperCase()}${variantStr}`)
   }, [showToast])
 
-  const incItem = useCallback((id: string) => {
-    setCart((c) => ({ ...c, [id]: (c[id] || 0) + 1 }))
+  const incItem = useCallback((productKey: string) => {
+    const newItem: CartItem = { id: crypto.randomUUID(), productKey, note: '' }
+    setCart((c) => [...c, newItem])
   }, [])
 
-  const decItem = useCallback((id: string) => {
+  const decItem = useCallback((productKey: string) => {
     setCart((c) => {
-      const next = { ...c }
-      if ((next[id] || 0) <= 1) delete next[id]
-      else next[id] = next[id] - 1
-      return next
+      const idx = [...c].map((i, j) => [i, j] as [CartItem, number]).reverse().find(([i]) => i.productKey === productKey)?.[1]
+      if (idx === undefined) return c
+      return c.filter((_, j) => j !== idx)
     })
   }, [])
 
-  const setNote = useCallback((key: string, text: string) => {
-    setNotes((n) => ({ ...n, [key]: text }))
+  const removeItem = useCallback((itemId: string) => {
+    setCart((c) => c.filter((i) => i.id !== itemId))
   }, [])
 
+  const setItemNote = useCallback((itemId: string, note: string) => {
+    setCart((c) => c.map((i) => i.id === itemId ? { ...i, note } : i))
+  }, [])
+
+  const getQty = useCallback((productKey: string) => {
+    return cart.filter((i) => i.productKey === productKey).length
+  }, [cart])
+
   const checkout = useCallback(
-    (lines: { key: string; name: string; variantLabel: string; qty: number; sub: number }[], totals: { total: number }) => {
+    (lines: { id: string; productKey: string; name: string; variantLabel: string; price: number; note: string }[], totals: { subtotal: number; total: number }) => {
       const L: string[] = []
       L.push('🍔 *NUOVO ORDINE — MAYO*')
       L.push('')
       L.push(`*Nome:* ${(custName || '').trim()}`)
       L.push(`*Orario ritiro:* ${pickupTime}`)
       L.push('')
+
+      const grouped = new Map<string, { name: string; variantLabel: string; price: number; qty: number; note: string }>()
       lines.forEach((l) => {
-        const variant = l.variantLabel ? ` (${l.variantLabel})` : ''
-        L.push(`▪️ ${l.qty}× ${l.name}${variant} — €${l.sub.toFixed(2)}`)
-        const note = (notes[l.key] || '').trim()
-        if (note) L.push(`   _↳ ${note}_`)
+        const gk = `${l.productKey}||${l.note.trim()}`
+        const ex = grouped.get(gk)
+        if (ex) ex.qty++
+        else grouped.set(gk, { name: l.name, variantLabel: l.variantLabel, price: l.price, qty: 1, note: l.note.trim() })
       })
+      grouped.forEach((g) => {
+        const variant = g.variantLabel ? ` (${g.variantLabel})` : ''
+        L.push(`▪️ ${g.qty}× ${g.name}${variant} — €${(g.price * g.qty).toFixed(2)}`)
+        if (g.note) L.push(`   _↳ ${g.note}_`)
+      })
+
       L.push('')
       L.push(`*TOTALE: €${totals.total.toFixed(2)}*`)
       L.push('')
       const text = encodeURIComponent(L.join('\n'))
       const url = `https://wa.me/39${info.phoneRaw}?text=${text}`
       window.open(url, '_blank')
-      setCart({})
-      setNotes({})
+      setCart([])
       setPickupTime('')
     },
-    [notes, custName, pickupTime, info]
+    [custName, pickupTime, info]
   )
 
   const pullStartRef = useRef(-1)
@@ -215,7 +228,7 @@ export default function MenuApp({ menu, info, hours, closures, banner }: MenuApp
             key={s.id}
             section={s}
             idx={idx}
-            cart={cart}
+            getQty={getQty}
             onAdd={addItem}
             onInc={incItem}
             onDec={decItem}
@@ -226,21 +239,20 @@ export default function MenuApp({ menu, info, hours, closures, banner }: MenuApp
       <Info hours={hours} info={info} />
       <Footer info={info} />
 
-      <Cart
+      <CartComp
         open={cartOpen}
         onClose={() => setCartOpen(false)}
         cart={cart}
-        notes={notes}
         custName={custName}
         pickupTime={pickupTime}
         menuFlat={menuFlat}
-        onInc={incItem}
-        onDec={decItem}
-        onNote={setNote}
+        onAddItem={incItem}
+        onRemoveItem={removeItem}
+        onSetNote={setItemNote}
         onName={setCustName}
         onTime={setPickupTime}
         onCheckout={checkout}
-        onClear={() => { setCart({}); setNotes({}); setPickupTime(''); showToast('CARRELLO SVUOTATO') }}
+        onClear={() => { setCart([]); setPickupTime(''); showToast('CARRELLO SVUOTATO') }}
         info={info}
         hours={hours}
         closures={closures}

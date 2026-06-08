@@ -1,28 +1,27 @@
 'use client'
 
 import { useState, useEffect, useMemo, useRef } from 'react'
-import type { CartMap, NotesMap, SiteInfo, HoursEntry, ClosureEntry } from '@/lib/types'
+import type { Cart, CartItem, SiteInfo, HoursEntry, ClosureEntry } from '@/lib/types'
 
 interface CartLine {
-  key: string
+  id: string           // CartItem.id
+  productKey: string   // for adding duplicate
   name: string
   variantLabel: string
   price: number
-  qty: number
-  sub: number
+  note: string
 }
 
 interface CartProps {
   open: boolean
   onClose: () => void
-  cart: CartMap
-  notes: NotesMap
+  cart: Cart
   custName: string
   pickupTime: string
   menuFlat: Record<string, { name: string; variantLabel: string; price: number }>
-  onInc: (key: string) => void
-  onDec: (key: string) => void
-  onNote: (key: string, text: string) => void
+  onAddItem: (productKey: string) => void
+  onRemoveItem: (itemId: string) => void
+  onSetNote: (itemId: string, note: string) => void
   onName: (name: string) => void
   onTime: (time: string) => void
   onCheckout: (lines: CartLine[], totals: { subtotal: number; total: number }) => void
@@ -35,7 +34,6 @@ interface CartProps {
 type Step = 'name' | 'time' | 'ready'
 
 function buildSlots(hours: HoursEntry[], closures: ClosureEntry[]): string[] {
-  // Check special closures (single day or range)
   const todayStr = new Date().toISOString().slice(0, 10)
   if (closures.some((c) => todayStr >= c.from && todayStr <= c.to)) return []
 
@@ -70,20 +68,18 @@ function initStep(custName: string, pickupTime: string): Step {
 }
 
 export default function Cart({
-  open, onClose, cart, notes, custName, pickupTime, menuFlat,
-  onInc, onDec, onNote, onName, onTime, onCheckout, onClear, info, hours, closures,
+  open, onClose, cart, custName, pickupTime, menuFlat,
+  onAddItem, onRemoveItem, onSetNote, onName, onTime, onCheckout, onClear, info, hours, closures,
 }: CartProps) {
-  const lines: CartLine[] = Object.keys(cart)
-    .filter((id) => cart[id] > 0)
-    .map((cartKey) => {
-      const entry = menuFlat[cartKey]
+  const lines: CartLine[] = cart
+    .map((item: CartItem) => {
+      const entry = menuFlat[item.productKey]
       if (!entry) return null
-      const qty = cart[cartKey]
-      return { key: cartKey, name: entry.name, variantLabel: entry.variantLabel, price: entry.price, qty, sub: entry.price * qty }
+      return { id: item.id, productKey: item.productKey, name: entry.name, variantLabel: entry.variantLabel, price: entry.price, note: item.note }
     })
     .filter(Boolean) as CartLine[]
 
-  const subtotal = lines.reduce((s, l) => s + l.sub, 0)
+  const subtotal = lines.reduce((s, l) => s + l.price, 0)
   const total = subtotal
   const aboveMin = subtotal >= info.minOrder
   const missing = Math.max(0, info.minOrder - subtotal)
@@ -93,7 +89,6 @@ export default function Cart({
   const nameRef = useRef<HTMLInputElement>(null)
   const slots = useMemo(() => buildSlots(hours, closures), [hours, closures])
 
-  // Reset on cart clear
   useEffect(() => {
     if (!custName && !pickupTime) {
       setStep('name')
@@ -101,7 +96,6 @@ export default function Cart({
     }
   }, [custName, pickupTime])
 
-  // Focus name input when drawer opens at step name
   useEffect(() => {
     if (open && step === 'name') {
       setTimeout(() => nameRef.current?.focus(), 320)
@@ -149,26 +143,26 @@ export default function Cart({
             </div>
           ) : (
             lines.map((l) => (
-              <div className="cart-line" key={l.key}>
+              <div className="cart-line" key={l.id}>
                 <div className="cart-line-main">
                   <div className="cart-line-name">{l.name}</div>
                   {l.variantLabel && <div className="cart-line-variant">{l.variantLabel}</div>}
-                  <div className="cart-line-price">€{l.price.toFixed(2)} cad.</div>
+                  <div className="cart-line-price">€{l.price.toFixed(2)}</div>
                   <div className="cart-line-controls">
-                    <button onClick={() => onDec(l.key)} aria-label="Riduci">−</button>
-                    <span className="q">{l.qty}</span>
-                    <button onClick={() => onInc(l.key)} aria-label="Aumenta">+</button>
+                    <button onClick={() => onRemoveItem(l.id)} aria-label="Rimuovi">−</button>
+                    <span className="q">1</span>
+                    <button onClick={() => onAddItem(l.productKey)} aria-label="Aggiungi altro">+</button>
                   </div>
                   <input
                     className="cart-line-note"
                     type="text"
-                    value={notes[l.key] || ''}
-                    onChange={(e) => onNote(l.key, e.target.value)}
-                    placeholder={l.qty > 1 ? `+ Nota (vale per tutti i ${l.qty})` : '+ Nota (es. senza cipolla…)'}
+                    value={l.note}
+                    onChange={(e) => onSetNote(l.id, e.target.value)}
+                    placeholder="+ Nota (es. senza cipolla…)"
                     maxLength={120}
                   />
                 </div>
-                <div className="sub-total">€{l.sub.toFixed(2)}</div>
+                <div className="sub-total">€{l.price.toFixed(2)}</div>
               </div>
             ))
           )}

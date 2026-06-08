@@ -59,5 +59,14 @@ export interface HeroBanner {
   tagline: string
 }
 
+export interface CartItem {
+  id: string           // unique line ID (crypto.randomUUID)
+  productKey: string   // "itemId::variantLabel"
+  note: string
+}
+
+export type Cart = CartItem[]
+
+// Legacy aliases kept for any remaining references
 export type CartMap = Record<string, number>
 export type NotesMap = Record<string, string>

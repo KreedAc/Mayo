@@ -1,16 +1,16 @@
-import type { MenuSection as MenuSectionType, MenuItem as MenuItemType, MenuVariant, CartMap } from '@/lib/types'
+import type { MenuSection as MenuSectionType, MenuItem as MenuItemType, MenuVariant } from '@/lib/types'
 import MenuItem from './MenuItem'
 
 interface MenuSectionProps {
   section: MenuSectionType
   idx: number
-  cart: CartMap
+  getQty: (key: string) => number
   onAdd: (item: MenuItemType, variant: MenuVariant) => void
   onInc: (key: string) => void
   onDec: (key: string) => void
 }
 
-export default function MenuSection({ section, idx, cart, onAdd, onInc, onDec }: MenuSectionProps) {
+export default function MenuSection({ section, idx, getQty, onAdd, onInc, onDec }: MenuSectionProps) {
   return (
     <section className="menu-section" id={`sec-${section.id}`}>
       <div className="cat-header">
@@ -23,7 +23,7 @@ export default function MenuSection({ section, idx, cart, onAdd, onInc, onDec }:
           <MenuItem
             key={item.id}
             item={item}
-            getQty={(variantLabel) => cart[`${item.id}::${variantLabel || ''}`] || 0}
+            getQty={(variantLabel) => getQty(`${item.id}::${variantLabel || ''}`)}
             onAdd={(variant) => onAdd(item, variant)}
             onInc={(variantLabel) => onInc(`${item.id}::${variantLabel || ''}`)}
             onDec={(variantLabel) => onDec(`${item.id}::${variantLabel || ''}`)}
