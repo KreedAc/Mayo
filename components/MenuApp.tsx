@@ -47,7 +47,10 @@ export default function MenuApp({ menu, info, hours, closures, banner }: MenuApp
     return f
   }, [menu])
 
-  const [cart, setCart] = useState<Cart>(() => readLocal('mayo-cart', []))
+  const [cart, setCart] = useState<Cart>(() => {
+    const v = readLocal<unknown>('mayo-cart', [])
+    return Array.isArray(v) ? (v as Cart) : []
+  })
   useEffect(() => { localStorage.setItem('mayo-cart', JSON.stringify(cart)) }, [cart])
 
   const [custName, setCustName] = useState<string>(() => {
