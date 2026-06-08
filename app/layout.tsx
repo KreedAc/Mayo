@@ -1,25 +1,71 @@
-import type { Metadata } from 'next'
+import type { Metadata, Viewport } from 'next'
 import './globals.css'
 
+const SITE_URL = 'https://mayolamezia.netlify.app'
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  viewportFit: 'cover',
+  themeColor: '#ffe600',
+}
+
 export const metadata: Metadata = {
-  title: 'MAYO — A Burger Experience · Lamezia Terme',
-  description: 'Smasheria di Lamezia Terme. Doppia patty pressata sulla piastra, crosta caramellata, pane brioche tostato al burro. Ordine rapido via WhatsApp.',
+  metadataBase: new URL(SITE_URL),
+  title: {
+    default: 'MAYO — Smasheria · Lamezia Terme',
+    template: '%s | MAYO Lamezia Terme',
+  },
+  description:
+    'MAYO è la smasheria di Lamezia Terme. Smash burger con doppia patty pressata sulla piastra, crosta caramellata, pane brioche tostato al burro. Ordina in asporto via WhatsApp.',
+  keywords: [
+    'smash burger Lamezia Terme',
+    'hamburger Lamezia Terme',
+    'smasheria Lamezia Terme',
+    'burger asporto Lamezia',
+    'MAYO burger',
+    'panino Lamezia Terme',
+    'fast food Lamezia Terme',
+    'smash burger calabria',
+  ],
+  authors: [{ name: 'MAYO Smasheria' }],
+  creator: 'MAYO Smasheria',
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: { index: true, follow: true },
+  },
+  alternates: {
+    canonical: '/',
+  },
   openGraph: {
-    title: 'MAYO — A Burger Experience',
-    description: 'Smasheria di Lamezia Terme.',
     type: 'website',
+    url: SITE_URL,
+    siteName: 'MAYO — Smasheria Lamezia Terme',
+    title: 'MAYO — Smash Burger · Lamezia Terme',
+    description:
+      'Smasheria di Lamezia Terme. Doppia patty pressata, crosta caramellata, pane brioche al burro. Ordina in asporto via WhatsApp.',
+    locale: 'it_IT',
+    images: [
+      {
+        url: '/og-image.jpg',
+        width: 1200,
+        height: 630,
+        alt: 'MAYO Smasheria — Lamezia Terme',
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'MAYO — Smash Burger · Lamezia Terme',
+    description: 'Smasheria di Lamezia Terme. Ordina in asporto via WhatsApp.',
+    images: ['/og-image.jpg'],
   },
   manifest: '/manifest.webmanifest',
-  themeColor: '#ffe600',
   appleWebApp: {
     capable: true,
     statusBarStyle: 'black-translucent',
     title: 'MAYO',
-  },
-  viewport: {
-    width: 'device-width',
-    initialScale: 1,
-    viewportFit: 'cover',
   },
 }
 
