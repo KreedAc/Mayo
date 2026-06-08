@@ -119,6 +119,9 @@ export default function MenuApp({ menu, info, hours, closures, banner }: MenuApp
       const text = encodeURIComponent(L.join('\n'))
       const url = `https://wa.me/39${info.phoneRaw}?text=${text}`
       window.open(url, '_blank')
+      setCart({})
+      setNotes({})
+      setPickupTime('')
     },
     [notes, custName, pickupTime, info]
   )

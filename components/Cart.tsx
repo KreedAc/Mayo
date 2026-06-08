@@ -164,7 +164,7 @@ export default function Cart({
                     type="text"
                     value={notes[l.key] || ''}
                     onChange={(e) => onNote(l.key, e.target.value)}
-                    placeholder="+ Note (es. senza cipolla, ben cotto…)"
+                    placeholder={l.qty > 1 ? `+ Nota (vale per tutti i ${l.qty})` : '+ Nota (es. senza cipolla…)'}
                     maxLength={120}
                   />
                 </div>
