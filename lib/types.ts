@@ -66,7 +66,3 @@ export interface CartItem {
 }
 
 export type Cart = CartItem[]
-
-// Legacy aliases kept for any remaining references
-export type CartMap = Record<string, number>
-export type NotesMap = Record<string, string>

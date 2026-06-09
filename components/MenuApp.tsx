@@ -53,6 +53,16 @@ export default function MenuApp({ menu, info, hours, closures, banner }: MenuApp
   })
   useEffect(() => { localStorage.setItem('mayo-cart', JSON.stringify(cart)) }, [cart])
 
+  // Drop units whose product no longer exists in the menu (deleted/hidden by admin),
+  // and clean up the localStorage key left over from the old notes model
+  useEffect(() => {
+    setCart((c) => {
+      const valid = c.filter((i) => menuFlat[i.productKey])
+      return valid.length === c.length ? c : valid
+    })
+    try { localStorage.removeItem('mayo-cart-notes') } catch { /* ignore */ }
+  }, [menuFlat])
+
   const [custName, setCustName] = useState<string>(() => {
     if (typeof window === 'undefined') return ''
     try { return localStorage.getItem('mayo-cust-name') || '' } catch { return '' }
@@ -83,8 +93,8 @@ export default function MenuApp({ menu, info, hours, closures, banner }: MenuApp
     showToast(`+ ${item.name.toUpperCase()}${variantStr}`)
   }, [showToast])
 
-  const incItem = useCallback((productKey: string) => {
-    const newItem: CartItem = { id: crypto.randomUUID(), productKey, note: '' }
+  const incItem = useCallback((productKey: string, note = '') => {
+    const newItem: CartItem = { id: crypto.randomUUID(), productKey, note }
     setCart((c) => [...c, newItem])
   }, [])
 
@@ -107,6 +117,8 @@ export default function MenuApp({ menu, info, hours, closures, banner }: MenuApp
   const getQty = useCallback((productKey: string) => {
     return cart.filter((i) => i.productKey === productKey).length
   }, [cart])
+
+  const pendingClearRef = useRef(false)
 
   const checkout = useCallback(
     (lines: { id: string; productKey: string; name: string; variantLabel: string; price: number; note: string }[], totals: { subtotal: number; total: number }) => {
@@ -136,11 +148,25 @@ export default function MenuApp({ menu, info, hours, closures, banner }: MenuApp
       const text = encodeURIComponent(L.join('\n'))
       const url = `https://wa.me/39${info.phoneRaw}?text=${text}`
       window.open(url, '_blank')
-      setCart([])
-      setPickupTime('')
+      // Don't clear right away: if WhatsApp fails to open the order would be lost.
+      // The cart is emptied when the user comes back to this tab (see effect below).
+      pendingClearRef.current = true
     },
     [custName, pickupTime, info]
   )
+
+  useEffect(() => {
+    const onVisible = () => {
+      if (document.visibilityState === 'visible' && pendingClearRef.current) {
+        pendingClearRef.current = false
+        setCart([])
+        setPickupTime('')
+        setCartOpen(false)
+      }
+    }
+    document.addEventListener('visibilitychange', onVisible)
+    return () => document.removeEventListener('visibilitychange', onVisible)
+  }, [])
 
   const pullStartRef = useRef(-1)
   const pullPctRef = useRef(0)

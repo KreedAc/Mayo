@@ -2,7 +2,7 @@ import type { MenuSection, MenuItem, HeroBanner, HoursEntry, ClosureEntry } from
 import { MAYO_MENU, MAYO_HOURS, MAYO_INFO, DEFAULT_CLOSURES } from './data'
 import { supabase } from './supabase'
 
-const DEFAULT_BANNER: HeroBanner = {
+export const DEFAULT_BANNER: HeroBanner = {
   line1: 'SMASH',
   line2: 'IT.',
   tagline:
@@ -47,7 +47,7 @@ async function fetchSiteConfig(): Promise<SiteConfigResult> {
   }
 }
 
-interface SupabaseProduct {
+export interface SupabaseProduct {
   id: string
   category_id: string
   name: string
@@ -62,7 +62,7 @@ interface SupabaseProduct {
   product_variants: { id: string; label: string; price: number; sort_order: number }[]
 }
 
-interface SupabaseCategory {
+export interface SupabaseCategory {
   id: string
   label: string
   emoji: string
@@ -70,9 +70,10 @@ interface SupabaseCategory {
   sort_order: number
 }
 
-function transformToMenu(
+export function transformToMenu(
   categories: SupabaseCategory[],
-  products: SupabaseProduct[]
+  products: SupabaseProduct[],
+  includeHidden = false
 ): MenuSection[] {
   return categories
     .sort((a, b) => a.sort_order - b.sort_order)
@@ -82,7 +83,7 @@ function transformToMenu(
       emoji: cat.emoji || '',
       blurb: cat.blurb || '',
       items: products
-        .filter((p) => p.category_id === cat.id && !p.hidden)
+        .filter((p) => p.category_id === cat.id && (includeHidden || !p.hidden))
         .sort((a, b) => a.sort_order - b.sort_order)
         .map((p): MenuItem => {
           const variants = p.product_variants
@@ -98,6 +99,7 @@ function transformToMenu(
             featured: p.featured || false,
             badges: p.badges || [],
             allergens: p.allergens?.length ? p.allergens : undefined,
+            hidden: p.hidden || false,
           }
         }),
     }))

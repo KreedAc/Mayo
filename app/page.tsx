@@ -1,4 +1,5 @@
 import { getMenu } from '@/lib/menu'
+import { SITE_URL } from '@/lib/site'
 import MenuApp from '@/components/MenuApp'
 import type { HoursEntry } from '@/lib/types'
 
@@ -30,7 +31,7 @@ export default async function HomePage() {
     name: 'MAYO Smasheria',
     description:
       'Smasheria di Lamezia Terme. Smash burger con doppia patty pressata sulla piastra, crosta caramellata, pane brioche tostato al burro.',
-    url: 'https://mayolamezia.netlify.app',
+    url: SITE_URL,
     telephone: info.phone,
     address: {
       '@type': 'PostalAddress',
@@ -48,14 +49,14 @@ export default async function HomePage() {
     priceRange: '€€',
     currenciesAccepted: 'EUR',
     paymentAccepted: 'Cash, Credit Card',
-    image: 'https://mayolamezia.netlify.app/og-image.jpg',
+    image: `${SITE_URL}/og-image.jpg`,
     sameAs: [info.igUrl],
     openingHours: buildOpeningHours(hours),
-    hasMenu: 'https://mayolamezia.netlify.app/#menu',
+    hasMenu: `${SITE_URL}/#menu`,
     menu: {
       '@type': 'Menu',
       name: 'Menu MAYO',
-      url: 'https://mayolamezia.netlify.app/#menu',
+      url: `${SITE_URL}/#menu`,
       hasMenuSection: menu.map((section) => ({
         '@type': 'MenuSection',
         name: section.label,

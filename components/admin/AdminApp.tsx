@@ -2,9 +2,9 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react'
 import type { MenuSection, MenuItem, HoursEntry, ClosureEntry } from '@/lib/types'
-import { MAYO_HOURS, DEFAULT_CLOSURES } from '@/lib/data'
+import { MAYO_HOURS, DEFAULT_CLOSURES, MAYO_MENU } from '@/lib/data'
 import { supabase } from '@/lib/supabase'
-import { MAYO_MENU } from '@/lib/data'
+import { DEFAULT_BANNER, transformToMenu, type SupabaseCategory, type SupabaseProduct } from '@/lib/menu'
 import Login from './Login'
 import Catalog from './Catalog'
 import ProductForm, { emptyDraft, draftFromItem } from './ProductForm'
@@ -29,40 +29,15 @@ const isUUID = (id: string) => UUID_RE.test(id)
 async function fetchCatalogFromSupabase(): Promise<MenuSection[] | null> {
   if (!supabase) return null
   try {
-  const [{ data: cats, error: ce }, { data: prods, error: pe }] = await Promise.all([
-    supabase.from('categories').select('*').order('sort_order'),
-    supabase.from('products').select('*, product_variants(*)').order('sort_order'),
-  ])
-  if (ce || pe || !cats || !prods) return null
-  const sections = (cats as { id: string; label: string; emoji: string; blurb: string; sort_order: number }[])
-    .sort((a, b) => a.sort_order - b.sort_order)
-    .map((cat) => ({
-      id: cat.id, label: cat.label, emoji: cat.emoji || '', blurb: cat.blurb || '',
-      items: (prods as (MenuItem & { category_id: string; description?: string; image_url?: string; allergens?: string[]; sort_order: number; product_variants?: { label: string; price: number; sort_order: number }[] })[])
-        .filter((p) => p.category_id === cat.id)
-        .sort((a, b) => a.sort_order - b.sort_order)
-        .map((p) => ({
-          id: p.id, name: p.name,
-          desc: (p as unknown as { description?: string }).description || '',
-          img: (p as unknown as { image_url?: string }).image_url || undefined,
-          price: p.price ?? undefined,
-          variants: p.product_variants?.length ? p.product_variants.sort((a, b) => a.sort_order - b.sort_order).map((v) => ({ label: v.label, price: Number(v.price) })) : undefined,
-          featured: p.featured || false,
-          badges: p.badges || [],
-          allergens: (p as unknown as { allergens?: string[] }).allergens?.length ? (p as unknown as { allergens: string[] }).allergens : undefined,
-          hidden: (p as unknown as { hidden?: boolean }).hidden || false,
-        })),
-    }))
-    .filter((s) => s.items.length > 0)
-  // return null (not empty array) when DB has no data yet
-  return sections.length > 0 ? sections : null
+    const [{ data: cats, error: ce }, { data: prods, error: pe }] = await Promise.all([
+      supabase.from('categories').select('*').order('sort_order'),
+      supabase.from('products').select('*, product_variants(*)').order('sort_order'),
+    ])
+    if (ce || pe || !cats || !prods) return null
+    const sections = transformToMenu(cats as SupabaseCategory[], prods as SupabaseProduct[], true)
+    // return null (not empty array) when DB has no data yet
+    return sections.length > 0 ? sections : null
   } catch { return null }
-}
-
-const DEFAULT_BANNER = {
-  line1: 'SMASH',
-  line2: 'IT.',
-  tagline: 'Smasheria di Lamezia Terme. Doppia patty pressata sulla piastra, crosta caramellata, pane brioche tostato al burro. Senza compromessi.',
 }
 
 export default function AdminApp() {
@@ -161,6 +136,16 @@ export default function AdminApp() {
     if (!supabase || syncing) return
     setSyncing(true)
     showToast('IMPORTAZIONE IN CORSO…')
+
+    // Never import twice: a second run would duplicate the whole catalog
+    const { count } = await supabase.from('products').select('id', { count: 'exact', head: true })
+    if (count && count > 0) {
+      setSyncing(false)
+      setDbSynced(true)
+      showToast('IL DATABASE CONTIENE GIÀ IL CATALOGO')
+      await loadCatalog()
+      return
+    }
 
     // Upsert categories
     await supabase.from('categories').upsert(
@@ -302,17 +287,19 @@ export default function AdminApp() {
 
     if (supabase) {
       if (treatAsNew) {
-        // Ensure category exists first
+        // Ensure category exists, without touching its sort_order if it already does
         const sec = MAYO_MENU.find((s) => s.id === catId) || catalog.find((s) => s.id === catId)
         if (sec) {
           await supabase.from('categories').upsert(
             { id: sec.id, label: sec.label, emoji: sec.emoji, blurb: sec.blurb, sort_order: 0 },
-            { onConflict: 'id' }
+            { onConflict: 'id', ignoreDuplicates: true }
           )
         }
+        // Append at the end of the category
+        const nextOrder = catalog.find((s) => s.id === catId)?.items.length ?? 0
         const { data: prod } = await supabase
           .from('products')
-          .insert({ category_id: catId, name: item.name, description: item.desc, image_url: item.img || null, price: item.price ?? null, featured: item.featured || false, badges: item.badges || [], allergens: item.allergens || [], sort_order: 0 })
+          .insert({ category_id: catId, name: item.name, description: item.desc, image_url: item.img || null, price: item.price ?? null, featured: item.featured || false, badges: item.badges || [], allergens: item.allergens || [], sort_order: nextOrder })
           .select().single()
         if (prod) {
           if (item.variants?.length) {

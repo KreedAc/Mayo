@@ -1,7 +1,6 @@
 import type { Metadata, Viewport } from 'next'
+import { SITE_URL } from '@/lib/site'
 import './globals.css'
-
-const SITE_URL = 'https://mayolamezia.netlify.app'
 
 export const viewport: Viewport = {
   width: 'device-width',
