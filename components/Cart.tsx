@@ -68,7 +68,7 @@ function buildSlots(hours: HoursEntry[], closures: ClosureEntry[]): string[] {
     let end = eh * 60 + em
     if (end <= start) end += 24 * 60
     for (let t = start; t <= end; t += 15) {
-      if (t < nowMin + 20) continue
+      if (t < nowMin + 15) continue
       const hh = Math.floor(t / 60) % 24
       const mm = t % 60
       slots.push(`${String(hh).padStart(2, '0')}:${String(mm).padStart(2, '0')}`)
