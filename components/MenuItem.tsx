@@ -14,12 +14,13 @@ interface MenuItemProps {
 export default function MenuItem({ item, getQty, onAdd, onInc, onDec }: MenuItemProps) {
   const variants: MenuVariant[] = item.variants || [{ label: '', price: item.price || 0 }]
   const singleNoLabel = variants.length === 1 && !variants[0].label
+  const isHero = !!item.badges?.includes('LIMITED')
   const [showAllergens, setShowAllergens] = useState(false)
   const [showImage, setShowImage] = useState(false)
 
   return (
     <>
-      <article className={`menu-item ${item.featured ? 'featured' : ''}`}>
+      <article className={`menu-item ${isHero ? 'featured' : ''}`}>
         {item.img && (
           <div className="menu-item-photo" onClick={() => setShowImage(true)} style={{ cursor: 'zoom-in' }}>
             {/* eslint-disable-next-line @next/next/no-img-element */}

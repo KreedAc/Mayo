@@ -10,7 +10,16 @@ interface MenuSectionProps {
   onDec: (key: string) => void
 }
 
+// A hero (full-width) card is any item tagged LIMITED
+const isHero = (i: MenuItemType) => !!i.badges?.includes('LIMITED')
+
 export default function MenuSection({ section, idx, getQty, onAdd, onInc, onDec }: MenuSectionProps) {
+  // Hero cards always render first in their category so the grid below them
+  // stays aligned (a hero in the middle would break the 2-column flow)
+  const orderedItems = [
+    ...section.items.filter(isHero),
+    ...section.items.filter((i) => !isHero(i)),
+  ]
   return (
     <section className="menu-section" id={`sec-${section.id}`}>
       <div className="cat-header">
@@ -19,7 +28,7 @@ export default function MenuSection({ section, idx, getQty, onAdd, onInc, onDec 
         {section.blurb && <p className="cat-blurb">{section.blurb}</p>}
       </div>
       <div className="menu-grid">
-        {section.items.map((item) => (
+        {orderedItems.map((item) => (
           <MenuItem
             key={item.id}
             item={item}

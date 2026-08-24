@@ -4,13 +4,6 @@ const J = 'https://nxwwzllozuoyixmurwmp.supabase.co/storage/v1/object/public/pro
 
 export const MAYO_MENU: MenuSection[] = [
   {
-    id: 'novita', label: 'Novità', emoji: '☀️',
-    blurb: 'Le ultime aggiunte. Edizioni limitate.',
-    items: [
-      { id: 'ribs-bbq', name: 'RIBS IN SALSA BBQ', desc: 'Ribs di suino glassate in salsa BBQ, pezzi limitatissimi.', variants: [{ label: '3pz', price: 6.0 }], badges: ['LIMITED', 'NEW'], img: J+'photoroom-20260508-115444-31212.jpg' },
-    ],
-  },
-  {
     id: 'sticks', label: 'Mayo Sticks', emoji: '🍟',
     blurb: 'La nostra selezione di patatine fritte.',
     items: [
@@ -20,7 +13,7 @@ export const MAYO_MENU: MenuSection[] = [
       { id: 'wurstel-aff', name: 'CON WURSTEL AFFUMICATO', desc: 'Patatine fritte con wurstel di suino affumicato (bockwurst).', variants: [{ label: 'Solo wurstel', price: 5.0 }, { label: 'Wurstel e cheddar', price: 6.0 }], img: J+'photoroom-20240809-215551-25149.jpg' },
       { id: 'bacon-cheddar', name: 'BACON E CHEDDAR', desc: 'Patatine ricoperte da cheddar fuso e polvere di bacon croccante.', price: 6.0, img: J+'photoroom-20240809-215503-25148.jpg' },
       { id: 'pulled-pork', name: 'PULLED PORK E CHEDDAR', desc: 'Patatine con pulled pork e cheddar fuso.', price: 7.0, img: J+'photoroom-20240809-215735-25147.jpg' },
-      { id: 'premium', name: 'PREMIUM 👑', desc: 'Patatine, cheddar fuso, petto di pollo croccante a tocchetti, salsa 1869.', price: 8.0, badges: ['CHEF'], featured: true, img: J+'photoroom-20240809-214718-25146.jpg' },
+      { id: 'premium', name: 'PREMIUM 👑', desc: 'Patatine, cheddar fuso, petto di pollo croccante a tocchetti, salsa 1869.', price: 8.0, badges: ['CHEF'], img: J+'photoroom-20240809-214718-25146.jpg' },
     ],
   },
   {
@@ -30,7 +23,7 @@ export const MAYO_MENU: MenuSection[] = [
       { id: 'ribs-bbq-2', name: 'RIBS IN SALSA BBQ', desc: 'Ribs di suino glassate in salsa BBQ, pezzi limitatissimi.', variants: [{ label: '3pz', price: 6.0 }], badges: ['LIMITED'], img: J+'photoroom-20260508-115444-31211.jpg' },
       { id: 'cheddar-cup', name: 'COPPETTA DI CHEDDAR FUSO', desc: 'Puro godimento. 🧀', price: 3.0, img: J+'dcb40adb-6672-4037-a61e-bcefafa77d4c-29163.jpg' },
       { id: 'salse', name: 'SALSE EXTRA', desc: '1869 · New York · Western · Nduja · Pepi · BBQ · Ranch · Sriracha.', variants: [{ label: 'Cad.', price: 1.0 }], img: J+'photoroom-20250402-183349-27186.jpg' },
-      { id: 'appetizer-mix', name: 'APPETIZER MIX', desc: 'Mayo flakes 4pz, chicken wings 2pz, onion rings 2pz, jalapeno bites 2pz, cheese bites 2pz. Due salse a scelta.', price: 10.0, featured: true, badges: ['CHEF'], img: J+'img-8336-25153.jpg' },
+      { id: 'appetizer-mix', name: 'APPETIZER MIX', desc: 'Mayo flakes 4pz, chicken wings 2pz, onion rings 2pz, jalapeno bites 2pz, cheese bites 2pz. Due salse a scelta.', price: 10.0, badges: ['CHEF'], img: J+'img-8336-25153.jpg' },
       { id: 'mayo-flakes', name: 'MAYO FLAKES', desc: 'Croccanti fiocchi di petto di pollo marinati, fatti in casa con speciale panatura.', variants: [{ label: '7pz', price: 5.0 }, { label: '10pz', price: 7.0 }], img: J+'photoroom-20240808-185502-25001.jpg' },
       { id: 'corn-dogs', name: 'CORN DOGS', desc: 'Wurstel di pollo fritti in speciale panatura, due salse a scelta.', variants: [{ label: '2pz', price: 5.0 }], img: J+'img-8331-25145.jpg' },
       { id: 'pull-cheese', name: 'MAYO PULL CHEESE', desc: 'Bomba di pulled pork di nostra produzione, panata, ripiena di cheddar.', price: 3.0, img: J+'img-8333-25141.jpg' },
@@ -45,7 +38,7 @@ export const MAYO_MENU: MenuSection[] = [
     blurb: 'Burger buns, macinato sempre fresco di bovino, pollo 100% italiano allevato a terra, salse ideate da noi. Riconoscerai MAYO al primo morso.',
     items: [
       { id: 'spicy-kiki', name: 'SPICY KIKI 🌶️', desc: 'Petto di pollo croccante, cetrioli Oi Muchim fatti in casa, salsa ranch, maionese piccante.', price: 9.0, badges: ['LIMITED', 'HOT'], img: J+'photoroom-20260407-185314-30929.jpg' },
-      { id: 'mayo-icon', name: 'MAYO ICON 🥓', desc: 'Doppio smash burger di bovino fresco, cheddar, bacon, CRISPY sauce.', variants: [{ label: 'Doppio', price: 9.0 }, { label: 'Triplo', price: 11.0 }], featured: true, badges: ['CHEF'], img: J+'photoroom-20260422-214716-31032.jpg' },
+      { id: 'mayo-icon', name: 'MAYO ICON 🥓', desc: 'Doppio smash burger di bovino fresco, cheddar, bacon, CRISPY sauce.', variants: [{ label: 'Doppio', price: 9.0 }, { label: 'Triplo', price: 11.0 }], badges: ['CHEF'], img: J+'photoroom-20260422-214716-31032.jpg' },
       { id: 'oklahoma', name: 'OKLAHOMA 🇺🇸', desc: 'Gusto americano. Smash burger con cipolle piastrate, cheddar, cetriolini, senape e ketchup.', variants: [{ label: 'Singolo', price: 7.0 }, { label: 'Doppio', price: 9.0 }], img: J+'photoroom-20250520-032431-28167.jpg' },
       { id: 'glorious', name: 'GLORIOUS 🍔', desc: 'Smash burger di bovino fresco, scamorza affumicata, pomodoro, iceberg, MAYOnese.', variants: [{ label: 'Singolo', price: 7.0 }, { label: 'Doppio', price: 9.0 }, { label: 'Triplo', price: 11.0 }], img: J+'photoroom-20240808-165713-25009.jpg' },
       { id: 'yankee', name: 'YANKEE 🇺🇸', desc: 'Smash burger di bovino fresco, cheddar, bacon, cipolla rossa caramellata, cetriolini, NEW YORK sauce.', variants: [{ label: 'Singolo', price: 7.5 }, { label: 'Doppio', price: 9.5 }, { label: 'Triplo', price: 11.5 }], img: J+'photoroom-20250313-050533-26897.jpg' },

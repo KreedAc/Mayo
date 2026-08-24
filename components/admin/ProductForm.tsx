@@ -214,7 +214,7 @@ export default function ProductForm({ catalog, draft: initial, isNew, onCancel, 
                 <button type="button" key={b} className={`badge-pick ${d.badges.includes(b) ? 'on' : ''}`} onClick={() => toggleBadge(b)}>{b}</button>
               ))}
             </div>
-            <div className="field-hint">NEW = novità · HOT = piccante · CHEF = consigliato · LIMITED = edizione limitata · VEG = vegetariano.</div>
+            <div className="field-hint">NEW = novità · HOT = piccante · CHEF = consigliato · LIMITED = edizione limitata · VEG = vegetariano. Il tag <b>LIMITED</b> rende il prodotto una card grande, mostrata per prima nella sua categoria.</div>
           </div>
 
           <div className="field">
@@ -225,14 +225,6 @@ export default function ProductForm({ catalog, draft: initial, isNew, onCancel, 
               ))}
             </div>
             <div className="field-hint">Seleziona tutti gli allergeni presenti nel prodotto (14 allergeni EU obbligatori per legge).</div>
-          </div>
-
-          <div className="field">
-            <label className="field-label">In evidenza</label>
-            <button type="button" className={`badge-pick ${d.featured ? 'on' : ''}`} onClick={() => set('featured', !d.featured)}>
-              {d.featured ? "★ CHEF'S PICK ATTIVO" : '☆ Metti in evidenza'}
-            </button>
-            <div className="field-hint">Il prodotto occupa una card grande con etichetta &quot;CHEF&apos;s PICK&quot;.</div>
           </div>
 
           <div className="form-actions">
